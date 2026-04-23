@@ -1,0 +1,1678 @@
+const yearEl = document.getElementById("year");
+if (yearEl) yearEl.textContent = new Date().getFullYear();
+
+const pageName = document.body.dataset.page;
+const navLink = document.querySelector(`[data-nav="${pageName}"]`);
+if (navLink) navLink.classList.add("is-active");
+
+const root = document.getElementById("page-root");
+const authActions = document.getElementById("authActions");
+const navToggle = document.getElementById("navToggle");
+const navLinks = document.querySelector(".landing-nav-links");
+const footerBlurb = document.getElementById("homeFooterBlurb");
+
+let currentSession = null;
+let currentPage = null;
+let currentData = null;
+let editMode = false;
+let pageSnapshot = null;
+let dataSnapshot = null;
+let editorBound = false;
+
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;");
+}
+
+function formatDate(value) {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return new Intl.DateTimeFormat("en-IN", {
+    day: "numeric",
+    month: "short",
+    year: "numeric"
+  }).format(date);
+}
+
+function initialsFor(value) {
+  return String(value || "")
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("")
+    .toUpperCase();
+}
+
+function iconMarkup(icon) {
+  const icons = {
+    map: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.27 7 13 7 13s7-7.73 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>',
+    community:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8ZM4 21a8 8 0 0 1 16 0H4Zm14-9a3 3 0 1 1 0-6 3 3 0 0 1 0 6ZM2 12a3 3 0 1 1 0-6 3 3 0 0 1 0 6Z"/></svg>',
+    trophy:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v4a6 6 0 0 1-5 5.91V16h4v2H7v-2h4v-3.09A6 6 0 0 1 6 7V3Zm-3 1h3v2a3 3 0 0 1-3 3V4Zm18 0v5a3 3 0 0 1-3-3V4h3Z"/></svg>',
+    people:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm8 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6ZM2 21a6 6 0 0 1 12 0H2Zm12 0a5 5 0 0 1 8 0h-8Z"/></svg>',
+    flag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h2v20H6V2Zm3 2h9l-2 4 2 4H9V4Z"/></svg>',
+    clinics:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3a2 2 0 0 1 2 2v4a3 3 0 1 1-2 0V5h10v4a3 3 0 1 1-2 0V3H7Zm5 10 6 8h-3l-3-4-3 4H6l6-8Z"/></svg>'
+  };
+
+  return icons[icon] || icons.map;
+}
+
+function createLoader() {
+  const loader = document.createElement("div");
+  loader.className = "page-loader";
+  loader.innerHTML = `
+    <div class="page-loader-inner">
+      <div class="page-loader-scene" aria-hidden="true">
+        <div class="page-loader-ring page-loader-ring--outer"></div>
+        <div class="page-loader-ring page-loader-ring--inner"></div>
+        <div class="page-loader-core">
+          <img src="assets/logo.jpeg" alt="RPA logo" class="page-loader-logo" />
+        </div>
+      </div>
+      <p class="page-loader-text">Loading Rajasthan Pickleball</p>
+    </div>
+  `;
+  document.body.append(loader);
+  return loader;
+}
+
+function hideLoader(loader) {
+  if (!loader) return;
+  loader.classList.add("is-hidden");
+  window.setTimeout(() => loader.remove(), 420);
+}
+
+function getByPath(target, path) {
+  return path.split(".").reduce((value, key) => (value == null ? value : value[key]), target);
+}
+
+function deepClone(value) {
+  return JSON.parse(JSON.stringify(value));
+}
+
+function setByPath(target, path, nextValue) {
+  const parts = path.split(".");
+  const last = parts.pop();
+  const parent = parts.reduce((value, key) => value[key], target);
+  parent[last] = nextValue;
+}
+
+function isAdminSession(session = currentSession) {
+  return false;
+}
+
+function createEditableMarkup(path, value, tagName, className = "") {
+  const text = escapeHtml(value || "");
+  return `<${tagName}${className ? ` class="${className}"` : ""}>${text}</${tagName}>`;
+}
+
+function createRecordEditableMarkup(type, recordId, field, value, tagName, className = "") {
+  const text = escapeHtml(value || "");
+  return `<${tagName}${className ? ` class="${className}"` : ""}>${text}</${tagName}>`;
+}
+
+function createEditableImageMarkup(config) {
+  const { source, path, recordType, recordId, field, value, alt, className = "" } = config;
+  const src = escapeHtml(value || "assets/logo.jpeg");
+  return `<img src="${src}" alt="${escapeHtml(alt || "")}" class="${className}" />`;
+}
+
+function setContentEditableState(container) {
+  return;
+}
+
+function showEditToolbar() {
+  return;
+}
+
+function maybeShowAuthPrompt(session) {
+  return;
+}
+
+async function uploadImageFile(file) {
+  return "";
+}
+
+function applyDomChanges(container) {
+  return [];
+}
+
+async function saveAllChanges() {
+  return;
+}
+
+function renderAuthActions(session) {
+  if (!authActions) return;
+
+  authActions.innerHTML = session?.authenticated
+    ? `
+      <span class="session-pill">${escapeHtml(session.user?.username || "Member")}</span>
+      <a href="auth.html" class="btn btn-primary">My Account</a>
+    `
+    : `
+      <a href="membership.html" class="btn btn-primary">Become a Member</a>
+    `;
+}
+
+function updateRecord(type, recordId, field, nextValue) {
+  const list = currentData?.[type];
+  if (!Array.isArray(list)) return null;
+  const record = list.find((item) => String(item.id) === String(recordId));
+  if (!record) return null;
+  record[field] = nextValue;
+  return record;
+}
+
+function renderPageHero(hero) {
+  const actions = (hero.actions || [])
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href)}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label)}</a>`
+    )
+    .join("");
+
+  const tags = (hero.tags || [])
+    .map((tag) => `<span class="hero-tag">${escapeHtml(tag)}</span>`)
+    .join("");
+
+  const stats = (hero.stats || [])
+    .map(
+      (item, index) => `
+        <div class="landing-card landing-page-stat landing-page-stat--${index % 3}">
+          <strong>${escapeHtml(item.value)}</strong>
+          ${createEditableMarkup(`hero.stats.${index}.label`, item.label || "", "span", "landing-page-stat-label")}
+        </div>
+      `
+    )
+    .join("");
+
+  return `
+    <section class="landing-section landing-page-hero">
+      <div class="landing-page-hero-grid">
+        <div class="landing-page-hero-copy reveal">
+          <span class="landing-eyebrow">${escapeHtml(hero.eyebrow || "")}</span>
+          ${createEditableMarkup("hero.title", hero.title || "", "h1")}
+          ${createEditableMarkup("hero.description", hero.description || "", "p", "landing-lede")}
+          ${tags ? `<div class="tag-row">${tags}</div>` : ""}
+          ${actions ? `<div class="landing-hero-cta">${actions}</div>` : ""}
+        </div>
+        <div class="landing-page-hero-panel reveal">
+          <div class="landing-page-hero-orb"></div>
+          <div class="landing-page-hero-shell">
+            <div class="landing-page-badge">
+              <img src="assets/logo.jpeg" alt="RPA badge" class="hero-mark" />
+              <div>
+                <p class="panel-overline">Rajasthan Pickleball Association</p>
+                <h3>Official state platform</h3>
+              </div>
+            </div>
+            <p class="panel-note">
+              Structured growth, visible competition, stronger district engagement, and a cleaner public-facing state system.
+            </p>
+            ${stats ? `<div class="landing-page-stats">${stats}</div>` : ""}
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderAboutCustomPage(page, data) {
+  const hero = page.hero || {};
+  const sections = page.sections || [];
+  const whoWeAre = sections[0] || {};
+  const missionSection = sections[1] || {};
+  const recognitionSection = sections[2] || {};
+  const peopleSection = sections.find((section) => section.layout === "people") || {};
+  const districtSection = sections[4] || {};
+  const journeySection = sections.find((section) => section.layout === "timeline") || {};
+  const ctaSection = sections.find((section) => section.layout === "cta") || {};
+
+  const topCards = [
+    {
+      title: whoWeAre.kicker || "Who We Are",
+      body:
+        whoWeAre.body ||
+        "Rajasthan Pickleball Association is a non-profit organisation working toward the development of pickleball at grassroots, district and state level."
+    },
+    missionSection.items?.[0]
+      ? { title: missionSection.items[0].title || "Our Mission", body: missionSection.items[0].body || "" }
+      : {
+          title: "Our Mission",
+          body: "To promote pickleball at the grassroots, create opportunities for all, and build a strong competitive pathway."
+        },
+    missionSection.items?.[1]
+      ? { title: missionSection.items[1].title || "Our Vision", body: missionSection.items[1].body || "" }
+      : {
+          title: "Our Vision",
+          body: "To make Rajasthan a national leader in pickleball and inspire a healthier, more active community."
+        }
+  ];
+
+  const whatWeDo = [
+    {
+      icon: "people",
+      title: "Grassroots Development",
+      body: "Building awareness in schools, parks and communities across Rajasthan."
+    },
+    {
+      icon: "community",
+      title: "Coaching & Education",
+      body: "Training coaches and organising development camps."
+    },
+    {
+      icon: "trophy",
+      title: "Tournaments & Events",
+      body: "Hosting and supporting district and state-level events."
+    },
+    {
+      icon: "flag",
+      title: "State Selection Pathway",
+      body: "Structured trials and selection for National representation."
+    },
+    {
+      icon: "map",
+      title: "District Expansion",
+      body: "Expanding organised play to every district of Rajasthan."
+    },
+    {
+      icon: "clinics",
+      title: "Partnerships & Collaborations",
+      body: "Working with institutions to grow the sport together."
+    }
+  ];
+
+  const portraitFallbacks = [
+    "https://randomuser.me/api/portraits/women/44.jpg",
+    "https://randomuser.me/api/portraits/men/32.jpg",
+    "https://randomuser.me/api/portraits/men/22.jpg",
+    "https://randomuser.me/api/portraits/women/68.jpg",
+    "https://randomuser.me/api/portraits/men/54.jpg",
+    "https://randomuser.me/api/portraits/men/76.jpg"
+  ];
+
+  const people = [...(peopleSection.items || data.team || [])];
+  while (people.length < 6) {
+    people.push({
+      name: ["Vikram Jain", "Amit Soni"][people.length - 4] || "Office Bearer",
+      role: ["Treasurer", "Technical Director"][people.length - 4] || "RPA Office Bearer",
+      image: "assets/logo.jpeg"
+    });
+  }
+
+  const journey = (journeySection.items || []).slice(0, 5);
+
+  const heroActions = (hero.actions || [])
+    .slice(0, 2)
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href || "#")}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label || "Learn more")}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="about-rpa">
+      <section class="about-rpa-hero reveal">
+        <div class="about-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Affiliated with the Indian Pickleball Association")}</span>
+          <h1>
+            About
+            <span>Rajasthan Pickleball</span>
+            <em>Association.</em>
+          </h1>
+          <p>${escapeHtml(
+            hero.description ||
+              "We are the official governing body for pickleball in Rajasthan, committed to promoting, developing and taking the sport to every corner of the state."
+          )}</p>
+          <div class="about-rpa-actions">${heroActions}</div>
+        </div>
+        <div class="about-rpa-visual">
+          <img src="assets/About Main Image.png" alt="Rajasthan Pickleball Association hero visual" class="about-rpa-image" />
+        </div>
+      </section>
+
+      <section class="about-rpa-topcards reveal">
+        ${topCards
+          .map(
+            (card, index) => `
+              <article class="about-rpa-info about-rpa-info--${index + 1}">
+                <div class="about-rpa-info-icon">${iconMarkup(index === 0 ? "map" : index === 1 ? "community" : "trophy")}</div>
+                <h3>${escapeHtml(card.title || "")}</h3>
+                <p>${escapeHtml(card.body || "")}</p>
+              </article>
+            `
+          )
+          .join("")}
+      </section>
+
+      <section class="about-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>What We Do</h2>
+        </div>
+        <div class="about-rpa-do-grid">
+          ${whatWeDo
+            .map(
+              (item) => `
+                <article class="about-rpa-do-card">
+                  <div class="about-rpa-do-icon">${iconMarkup(item.icon)}</div>
+                  <h3>${escapeHtml(item.title)}</h3>
+                  <p>${escapeHtml(item.body)}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="about-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Leadership / Office Bearers</h2>
+        </div>
+        <div class="about-rpa-people-grid">
+          ${people
+            .slice(0, 6)
+            .map((person, index) => {
+              const image =
+                !person.image || person.image === "assets/logo.jpeg" ? portraitFallbacks[index % portraitFallbacks.length] : person.image;
+              return `
+                <article class="about-rpa-person-card">
+                  <img src="${escapeHtml(image)}" alt="${escapeHtml(person.name || "RPA office bearer")}" class="about-rpa-person-image" />
+                  <h3>${escapeHtml(person.name || "")}</h3>
+                  <p>${escapeHtml(person.role || "")}</p>
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      </section>
+
+      <section class="about-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Our Journey</h2>
+        </div>
+        <div class="about-rpa-timeline">
+          ${journey
+            .map(
+              (item) => `
+                <article class="about-rpa-milestone">
+                  <span class="about-rpa-year">${escapeHtml(item.year || "")}</span>
+                  <p>${escapeHtml(item.body || "")}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="about-rpa-banner reveal">
+        <div class="about-rpa-banner-copy">
+          <h2>${escapeHtml(ctaSection.title || "Be part of Rajasthan's pickleball journey.")}</h2>
+          <p>${escapeHtml(
+            ctaSection.body || "Together, let's build champions and stronger communities."
+          )}</p>
+        </div>
+        <div class="about-rpa-actions">
+          <a href="membership.html" class="btn btn-light">Become a Member</a>
+          <a href="contact.html" class="btn btn-outline-light">Contact the Team</a>
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderTournamentsCustomPage(page, data) {
+  const hero = page.hero || {};
+  const tournaments = (data.tournaments || []).slice(0, 3);
+  const featured = tournaments[1] || tournaments[0] || {};
+  const calendar = tournaments.length ? tournaments : [];
+  const categoryCards = [
+    { icon: "map", title: "Open" },
+    { icon: "people", title: "Juniors" },
+    { icon: "community", title: "Mixed" },
+    { icon: "flag", title: "Selections" }
+  ];
+  const faqItems = [
+    "How do I register for a tournament?",
+    "Who can participate?",
+    "What are the age categories?",
+    "What are the rules followed?"
+  ];
+  const fallbackImages = [
+    "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+  ];
+
+  const heroActions = (hero.actions || [])
+    .slice(0, 2)
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href || "#")}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label || "Learn more")}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="tourneys-rpa">
+      <section class="tourneys-rpa-hero reveal">
+        <div class="tourneys-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Official RPA Events")}</span>
+          <h1>
+            Tournaments &
+            <span>Competitions</span>
+          </h1>
+          <p>${escapeHtml(
+            hero.description || "Compete, improve, represent. Explore official tournaments and events across Rajasthan."
+          )}</p>
+          <div class="tourneys-rpa-actions">${heroActions}</div>
+        </div>
+        <div class="tourneys-rpa-visual">
+          <img src="assets/Tournaments Main Image.png" alt="Rajasthan tournaments visual" class="tourneys-rpa-image" />
+        </div>
+      </section>
+
+      <section class="tourneys-rpa-section reveal">
+        <div class="tourneys-rpa-section-head">
+          <h2>Featured Tournament</h2>
+        </div>
+        <article class="tourneys-featured">
+          <img
+            src="${escapeHtml(fallbackImages[0])}"
+            alt="${escapeHtml(featured.name || "Featured tournament")}"
+            class="tourneys-featured-image"
+          />
+          <div class="tourneys-featured-copy">
+            <h3>${escapeHtml(featured.name || "Udaipur Championship 2025")}</h3>
+            <p>${escapeHtml(formatDate(featured.date || "2025-08-08"))}</p>
+            <span>${escapeHtml(featured.city || "Udaipur, Rajasthan")}</span>
+            <div class="tourneys-featured-tags">
+              <span>${escapeHtml(featured.status || "Open")}</span>
+              <span>Mixed</span>
+              <span>Doubles</span>
+            </div>
+            <a href="${escapeHtml(featured.registrationLink || "contact.html")}" class="btn btn-primary">View Details</a>
+          </div>
+        </article>
+      </section>
+
+      <section class="tourneys-rpa-section reveal">
+        <div class="tourneys-rpa-section-head">
+          <h2>Upcoming Tournaments</h2>
+          <a href="tournaments.html">View all tournaments</a>
+        </div>
+        <div class="tourneys-rpa-grid">
+          ${tournaments
+            .map(
+              (item, index) => `
+                <article class="tourneys-card tourneys-card--${index + 1}">
+                  <img src="${escapeHtml(fallbackImages[(index + 1) % fallbackImages.length])}" alt="${escapeHtml(
+                    item.name || "Tournament image"
+                  )}" class="tourneys-card-image" />
+                  <div class="tourneys-card-copy">
+                    <h3>${escapeHtml(item.name || "")}</h3>
+                    <p>${escapeHtml(formatDate(item.date || ""))}</p>
+                    <span>${escapeHtml(item.city || "")}</span>
+                  </div>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="tourneys-rpa-columns reveal">
+        <div class="tourneys-rpa-section">
+          <div class="tourneys-rpa-section-head">
+            <h2>Tournament Categories</h2>
+          </div>
+          <div class="tourneys-categories">
+            ${categoryCards
+              .map(
+                (item) => `
+                  <article class="tourneys-category-card">
+                    <div class="tourneys-category-icon">${iconMarkup(item.icon)}</div>
+                    <h3>${escapeHtml(item.title)}</h3>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <div class="tourneys-rpa-section">
+          <div class="tourneys-rpa-section-head">
+            <h2>Tournament Calendar</h2>
+          </div>
+          <div class="tourneys-calendar">
+            ${calendar
+              .map(
+                (item) => `
+                  <article class="tourneys-calendar-row">
+                    <span>${escapeHtml(formatDate(item.date || ""))}</span>
+                    <strong>${escapeHtml(item.name || "")}</strong>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="tourneys-rpa-columns reveal">
+        <div class="tourneys-rpa-section">
+          <div class="tourneys-rpa-section-head">
+            <h2>Past Events / Results</h2>
+            <a href="media.html">View all results</a>
+          </div>
+          <div class="tourneys-results-grid">
+            ${fallbackImages
+              .map(
+                (image, index) => `
+                  <article class="tourneys-result-card">
+                    <img src="${escapeHtml(image)}" alt="Past tournament" class="tourneys-result-image" />
+                    <h3>${escapeHtml(["Rajasthan State Championship 2024", "Ajmer Open 2024", "Bikaner Open 2024", "Alwar Cup 2024"][index])}</h3>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <div class="tourneys-rpa-section">
+          <div class="tourneys-rpa-section-head">
+            <h2>FAQs</h2>
+          </div>
+          <div class="tourneys-faqs">
+            ${faqItems
+              .map(
+                (item) => `
+                  <details class="tourneys-faq-item">
+                    <summary>${escapeHtml(item)}</summary>
+                    <p>Please contact the tournament desk for the latest event-specific guidance and registration details.</p>
+                  </details>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="tourneys-rpa-banner reveal">
+        <div class="tourneys-rpa-banner-copy">
+          <h2>Ready to compete?</h2>
+          <p>Join our tournaments and showcase your talent.</p>
+        </div>
+        <div class="tourneys-rpa-actions">
+          <a href="auth.html#signup" class="btn btn-light">Register for Events</a>
+          <a href="contact.html" class="btn btn-outline-light">Tournament Enquiries</a>
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderDistrictsCustomPage(page) {
+  const hero = page.hero || {};
+  const stats = hero.stats || [];
+  const districtImages = [
+    "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=1200",
+    "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+  ];
+  const districtCards = [
+    { name: "Jaipur", meta: "Active district", image: districtImages[0] },
+    { name: "Jodhpur", meta: "Fast growing", image: districtImages[1] },
+    { name: "Udaipur", meta: "Lakeside network", image: districtImages[2] },
+    { name: "Kota", meta: "Youth pathway", image: districtImages[3] },
+    { name: "Ajmer", meta: "Emerging hub", image: districtImages[4] },
+    { name: "Bikaner", meta: "Expansion district", image: districtImages[5] }
+  ];
+  const roadmap = [
+    {
+      icon: "map",
+      title: "Active Districts",
+      body: "33+ districts and counting with visible host-city activity and local organisers."
+    },
+    {
+      icon: "clinics",
+      title: "Upcoming Districts",
+      body: "Expansion soon into 10+ more districts through partner venues and local leads."
+    },
+    {
+      icon: "community",
+      title: "Partner Network",
+      body: "Schools, clubs and academies helping turn new interest into sustained play."
+    }
+  ];
+
+  const heroActions = (hero.actions || [])
+    .slice(0, 2)
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href || "#")}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label || "Learn more")}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="districts-rpa">
+      <section class="districts-rpa-hero reveal">
+        <div class="districts-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Statewide Network")}</span>
+          <h1>
+            Pickleball Across
+            <span>Rajasthan</span>
+          </h1>
+          <p>${escapeHtml(
+            hero.description ||
+              "From cities to small towns, pickleball is growing everywhere. Explore our district network and be part of the movement."
+          )}</p>
+          <div class="districts-rpa-actions">${heroActions}</div>
+        </div>
+        <div class="districts-rpa-visual">
+          <img src="assets/Districts Main Image.png" alt="Rajasthan district network visual" class="districts-rpa-image" />
+        </div>
+      </section>
+
+      <section class="districts-rpa-stats reveal">
+        ${stats
+          .map((stat, index) => {
+            const icons = ["map", "community", "people", "clinics"];
+            return `
+              <article class="districts-rpa-stat">
+                <div class="districts-rpa-stat-icon">${iconMarkup(icons[index] || "map")}</div>
+                <div>
+                  <strong>${escapeHtml(stat.value || "")}</strong>
+                  <span>${escapeHtml(stat.label || "")}</span>
+                </div>
+              </article>
+            `;
+          })
+          .join("")}
+      </section>
+
+      <section class="districts-rpa-grid reveal" id="district-network">
+        <div class="districts-rpa-main">
+          <div class="about-rpa-section-head">
+            <h2>Districts</h2>
+          </div>
+          <div class="districts-rpa-cards">
+            ${districtCards
+              .map(
+                (district) => `
+                  <article class="districts-rpa-card">
+                    <img src="${escapeHtml(district.image)}" alt="${escapeHtml(district.name)} district" class="districts-rpa-card-image" />
+                    <div class="districts-rpa-card-copy">
+                      <h3>${escapeHtml(district.name)}</h3>
+                      <p>${escapeHtml(district.meta)}</p>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+
+        <aside class="districts-rpa-side">
+          <div class="about-rpa-section-head">
+            <h2>Expansion Roadmap</h2>
+          </div>
+          <div class="districts-rpa-roadmap">
+            ${roadmap
+              .map(
+                (item) => `
+                  <article class="districts-rpa-roadmap-card">
+                    <div class="districts-rpa-roadmap-icon">${iconMarkup(item.icon)}</div>
+                    <div>
+                      <h3>${escapeHtml(item.title)}</h3>
+                      <p>${escapeHtml(item.body)}</p>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </aside>
+      </section>
+
+      <section class="about-rpa-banner reveal">
+        <div class="about-rpa-banner-copy">
+          <h2>Help grow Rajasthan's district network.</h2>
+          <p>Bring the sport to new cities through hosting, coaching, venue support and community building.</p>
+        </div>
+        <div class="about-rpa-actions">
+          <a href="contact.html" class="btn btn-light">Partner With Us</a>
+          <a href="tournaments.html" class="btn btn-outline-light">See Events</a>
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderMembershipCustomPage(page) {
+  const hero = page.hero || {};
+  const sections = page.sections || [];
+  const benefits = sections.find((section) => section.kicker?.toLowerCase().includes("why join"))?.items || [];
+  const categories = sections.find((section) => section.kicker?.toLowerCase().includes("membership categories"))?.items || [];
+  const process = sections.find((section) => section.layout === "timeline")?.items || [];
+  const faqs = sections.find((section) => section.layout === "faq")?.items || [];
+  const ctaSection = sections.find((section) => section.layout === "cta") || {};
+
+  const heroActions = (hero.actions || [])
+    .slice(0, 2)
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href || "#")}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label || "Learn more")}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="membership-rpa">
+      <section class="membership-rpa-hero reveal">
+        <div class="membership-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Join The Community")}</span>
+          <h1>
+            Membership with
+            <span>Rajasthan Pickleball</span>
+            <em>Association</em>
+          </h1>
+          <p>${escapeHtml(
+            hero.description ||
+              "Join a growing community of players, coaches, and supporters committed to growing pickleball across the state."
+          )}</p>
+          <div class="membership-rpa-actions">${heroActions}</div>
+        </div>
+        <div class="membership-rpa-visual">
+          <img src="assets/Membership Main Image.png" alt="Membership visual" class="membership-rpa-image" />
+        </div>
+      </section>
+
+      <section class="membership-rpa-section reveal" id="membership-benefits">
+        <div class="about-rpa-section-head">
+          <h2>Why Join RPA?</h2>
+        </div>
+        <div class="membership-benefits-grid">
+          ${benefits
+            .map(
+              (item, index) => `
+                <article class="membership-benefit-card">
+                  <div class="membership-benefit-icon">${iconMarkup(["calendar", "community", "people", "flag"][index] || "map")}</div>
+                  <h3>${escapeHtml(item.title || "")}</h3>
+                  <p>${escapeHtml(item.body || "")}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="membership-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Membership Categories</h2>
+        </div>
+        <div class="membership-plan-grid">
+          ${categories
+            .map(
+              (item, index) => `
+                <article class="membership-plan-card membership-plan-card--${index + 1}">
+                  <div class="membership-plan-head">
+                    <h3>${escapeHtml(item.title || "")}</h3>
+                    <span>${escapeHtml(item.meta || "")}</span>
+                  </div>
+                  <p>${escapeHtml(item.body || "")}</p>
+                  <a href="auth.html#signup" class="btn ${index === 1 ? "btn-primary" : "btn-ghost"}">Join Now</a>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="membership-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>How It Works</h2>
+        </div>
+        <div class="membership-process-grid">
+          ${process
+            .map(
+              (item) => `
+                <article class="membership-process-card">
+                  <span class="membership-process-step">${escapeHtml(item.year || "")}</span>
+                  <p>${escapeHtml(item.body || "")}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="membership-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Membership FAQs</h2>
+        </div>
+        <div class="tourneys-faqs">
+          ${faqs
+            .map(
+              (item) => `
+                <details class="tourneys-faq-item">
+                  <summary>${escapeHtml(item.question || "")}</summary>
+                  <p>${escapeHtml(item.answer || "")}</p>
+                </details>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="about-rpa-banner reveal">
+        <img src="assets/Ball.png" alt="" class="rpa-banner-ball" />
+        <div class="about-rpa-banner-copy">
+          <h2>${escapeHtml(ctaSection.title || "Join Rajasthan's fastest-growing pickleball community.")}</h2>
+          <p>${escapeHtml(ctaSection.body || "Together we grow stronger events, better pathways, and more connected districts.")}</p>
+        </div>
+        <div class="about-rpa-actions">
+          <a href="auth.html#signup" class="btn btn-light">Become a Member</a>
+          <a href="contact.html" class="btn btn-outline-light">Contact Us</a>
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderMediaCustomPage(page, data) {
+  const hero = page.hero || {};
+  const sections = page.sections || [];
+  const galleryItems = (data.news || []).filter((item) => item.image);
+  const galleryFallback = [
+    {
+      title: "Jaipur Open gallery",
+      category: "Tournament",
+      image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+    },
+    {
+      title: "District clinic highlights",
+      category: "Community",
+      image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+    },
+    {
+      title: "State event visuals",
+      category: "Media",
+      image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+    }
+  ];
+  const heroActions = (hero.actions || [])
+    .slice(0, 2)
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href || "#")}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label || "Learn more")}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="media-rpa">
+      <section class="media-rpa-hero reveal">
+        <div class="media-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Gallery")}</span>
+          <h1>
+            Image
+            <span>Gallery</span>
+          </h1>
+          <p>${escapeHtml(
+            hero.description || "Browse highlights from tournaments, district clinics, and community sessions across Rajasthan."
+          )}</p>
+          <div class="media-rpa-actions">${heroActions}</div>
+        </div>
+        <div class="media-rpa-visual">
+          <img src="assets/Media Main Image.png" alt="Media page visual" class="media-rpa-image" />
+        </div>
+      </section>
+
+      <section class="media-rpa-section reveal" id="media-gallery" data-gallery-root>
+        <div class="about-rpa-section-head">
+          <h2>Gallery</h2>
+        </div>
+        <div class="media-gallery-grid">
+          ${(galleryItems.length ? galleryItems : galleryFallback)
+            .map((item, index) => {
+              const image = item.image || "";
+              const title = item.title || "Gallery image";
+              const category = item.category || "";
+              const href = `media.html?img=${encodeURIComponent(String(index))}#media-gallery`;
+              return `
+                <a class="media-gallery-card" href="${href}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
+                  image
+                )}" data-gallery-title="${escapeHtml(title)}">
+                  <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" class="media-gallery-image" />
+                  <div class="media-gallery-copy">
+                    <h3>${escapeHtml(title)}</h3>
+                    <p>${escapeHtml(category)}</p>
+                  </div>
+                </a>
+              `;
+            })
+            .join("")}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderContactCustomPage(page, data) {
+  const hero = page.hero || {};
+  const sections = page.sections || [];
+  const enquiryCards = sections[0]?.items || [];
+  const detailCards = sections[1]?.items || [];
+  const faqs = sections.find((section) => section.layout === "faq")?.items || [];
+  const galleryItems = (data?.news || []).filter((item) => item.image);
+  const galleryFallback = [
+    {
+      title: "Community sessions",
+      category: "Community",
+      image: "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+    },
+    {
+      title: "Tournament highlights",
+      category: "Tournament",
+      image: "https://images.unsplash.com/photo-1521412644187-c49fa049e84d?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+    },
+    {
+      title: "District clinics",
+      category: "Clinics",
+      image: "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+    }
+  ];
+  const heroActions = (hero.actions || [])
+    .slice(0, 2)
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href || "#")}" class="btn ${action.secondary ? "btn-ghost" : "btn-primary"}">${escapeHtml(action.label || "Learn more")}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="contact-rpa">
+      <section class="contact-rpa-hero reveal">
+        <div class="contact-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Get In Touch")}</span>
+          <h1>
+            Contact Rajasthan
+            <span>Pickleball Association</span>
+          </h1>
+          <p>${escapeHtml(hero.description || "Have a question or want to collaborate? We'd love to hear from you.")}</p>
+          <div class="contact-rpa-actions">${heroActions}</div>
+        </div>
+        <div class="contact-rpa-visual">
+          <img src="assets/Contact Main Image.png" alt="Contact page visual" class="contact-rpa-image" />
+        </div>
+      </section>
+
+      <section class="contact-rpa-strip reveal">
+        ${enquiryCards
+          .slice(0, 4)
+          .map(
+            (item, index) => `
+              <article class="contact-rpa-card">
+                <div class="contact-rpa-card-icon">${iconMarkup(["map", "trophy", "community", "flag"][index] || "map")}</div>
+                <div>
+                  <h3>${escapeHtml(item.title || "")}</h3>
+                  <p>${escapeHtml(item.body || "")}</p>
+                </div>
+              </article>
+            `
+          )
+          .join("")}
+      </section>
+
+      <section class="contact-rpa-gallery reveal" aria-label="Gallery" data-gallery-root>
+        <div class="about-rpa-section-head">
+          <h2>Gallery</h2>
+        </div>
+        <div class="media-gallery-grid">
+          ${(galleryItems.length ? galleryItems : galleryFallback)
+            .slice(0, 6)
+            .map((item, index) => {
+              const image = item.image || "";
+              const title = item.title || "Gallery image";
+              const category = item.category || "";
+              const href = `media.html?img=${encodeURIComponent(String(index))}#media-gallery`;
+              return `
+                <a class="media-gallery-card" href="${href}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
+                  image
+                )}" data-gallery-title="${escapeHtml(title)}">
+                  <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" class="media-gallery-image" />
+                  <div class="media-gallery-copy">
+                    <h3>${escapeHtml(title)}</h3>
+                    <p>${escapeHtml(category)}</p>
+                  </div>
+                </a>
+              `;
+            })
+            .join("")}
+        </div>
+      </section>
+
+      <section class="contact-rpa-grid reveal">
+        <div class="contact-rpa-form card-shell">
+          <div class="about-rpa-section-head">
+            <h2>Send Us a Message</h2>
+          </div>
+          <form class="contact-rpa-form-grid">
+            <input type="text" placeholder="Your Name" />
+            <input type="email" placeholder="Email Address" />
+            <input type="text" placeholder="Enquiry / Subject" />
+            <textarea placeholder="Tell us a little more"></textarea>
+            <button type="button" class="btn btn-primary">Send Message</button>
+          </form>
+        </div>
+        <div class="contact-rpa-details card-shell">
+          <div class="about-rpa-section-head">
+            <h2>Contact Details</h2>
+          </div>
+          <div class="contact-rpa-detail-list">
+            ${detailCards
+              .map(
+                (item, index) => `
+                  <article class="contact-rpa-detail-row">
+                    <div class="contact-rpa-card-icon">${iconMarkup(["community", "map", "flag"][index] || "map")}</div>
+                    <div>
+                      <h3>${escapeHtml(item.title || "")}</h3>
+                      <p>${escapeHtml(item.body || "")}</p>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="contact-rpa-faqs card-shell">
+          <div class="about-rpa-section-head">
+            <h2>FAQs</h2>
+          </div>
+          <div class="tourneys-faqs">
+            ${faqs
+              .map(
+                (item) => `
+                  <details class="tourneys-faq-item">
+                    <summary>${escapeHtml(item.question || "")}</summary>
+                    <p>${escapeHtml(item.answer || "")}</p>
+                  </details>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderCards(section, items, basePath) {
+  const cards = (items || [])
+    .map((item, index) => {
+      const title = item.name || item.title || "";
+      const body = item.summary || item.body || item.description || item.highlight || "";
+      const meta = [
+        item.meta,
+        item.category,
+        item.city,
+        item.role,
+        item.type,
+        item.date ? formatDate(item.date) : ""
+      ]
+        .filter(Boolean)
+        .join(" • ");
+      const href = item.href || item.link || item.url || item.registrationLink || "";
+      const cta = item.cta || item.linkText || (href ? "Learn more" : "");
+      const pathPrefix = `${basePath}.${index}`;
+      const isRecord = Boolean(item.id && section.source);
+      const titleField = item.name ? "name" : "title";
+      const bodyField = item.summary ? "summary" : item.body ? "body" : item.description ? "description" : "highlight";
+      const imageMarkup = item.image
+        ? createEditableImageMarkup({
+            source: isRecord ? "record" : "page",
+            path: `${pathPrefix}.image`,
+            recordType: section.source,
+            recordId: item.id,
+            field: "image",
+            value: item.image,
+            alt: title,
+            className: "card-media"
+          })
+        : "";
+
+      const titleMarkup = isRecord
+        ? createRecordEditableMarkup(section.source, item.id, titleField, title, "h3")
+        : createEditableMarkup(`${pathPrefix}.${titleField}`, title, "h3");
+
+      const bodyMarkup = isRecord
+        ? createRecordEditableMarkup(section.source, item.id, bodyField, body, "p")
+        : createEditableMarkup(`${pathPrefix}.${bodyField}`, body, "p");
+
+      return `
+        <article class="landing-card reveal">
+          ${imageMarkup}
+          ${meta ? `<span class="landing-card-tag">${escapeHtml(meta)}</span>` : ""}
+          ${titleMarkup}
+          ${bodyMarkup}
+          ${href ? `<a href="${escapeHtml(href)}" class="link">${escapeHtml(cta)} →</a>` : ""}
+        </article>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="landing-section${section.theme === "dark" ? " landing-section-dark" : ""}">
+      <div class="landing-section-head reveal">
+        <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath.replace(/\.items$/, "")}.title`, section.title || "", "h2")}
+        ${section.intro ? createEditableMarkup(`${basePath.replace(/\.items$/, "")}.intro`, section.intro, "p") : ""}
+      </div>
+      <div class="landing-cards">${cards}</div>
+    </section>
+  `;
+}
+
+function renderPeople(section, items, basePath) {
+  const cards = (items || [])
+    .map((item, index) => {
+      const pathPrefix = `${basePath}.${index}`;
+      const isRecord = Boolean(item.id && section.source);
+      const image = item.image
+        ? createEditableImageMarkup({
+            source: isRecord ? "record" : "page",
+            path: `${pathPrefix}.image`,
+            recordType: section.source,
+            recordId: item.id,
+            field: "image",
+            value: item.image,
+            alt: item.name || "RPA profile",
+            className: "person-photo"
+          })
+        : `<span class="person-initials">${escapeHtml(initialsFor(item.name))}</span>`;
+      const meta = [item.role, item.city].filter(Boolean).join(" • ");
+
+      const nameMarkup = isRecord
+        ? createRecordEditableMarkup(section.source, item.id, "name", item.name || "", "h3")
+        : createEditableMarkup(`${pathPrefix}.name`, item.name || "", "h3");
+
+      const highlightMarkup = isRecord
+        ? createRecordEditableMarkup(section.source, item.id, "highlight", item.highlight || "", "p")
+        : createEditableMarkup(`${pathPrefix}.highlight`, item.highlight || "", "p");
+
+      return `
+        <article class="landing-card landing-person-card reveal">
+          <div class="person-visual">${image}</div>
+          ${meta ? `<span class="landing-card-tag">${escapeHtml(meta)}</span>` : ""}
+          ${nameMarkup}
+          ${highlightMarkup}
+        </article>
+      `;
+    })
+    .join("");
+
+  return `
+    <section class="landing-section${section.theme === "dark" ? " landing-section-dark" : ""}">
+      <div class="landing-section-head reveal">
+        <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath.replace(/\.items$/, "")}.title`, section.title || "", "h2")}
+      </div>
+      <div class="landing-cards landing-people-grid">${cards}</div>
+    </section>
+  `;
+}
+
+function renderStory(section, basePath) {
+  return `
+    <section class="landing-section${section.theme === "dark" ? " landing-section-dark" : ""}">
+      <div class="landing-story-panel reveal">
+        <div class="landing-story-accent"></div>
+        <div class="landing-story-copy">
+          <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+          ${createEditableMarkup(`${basePath}.title`, section.title || "", "h2")}
+          ${createEditableMarkup(`${basePath}.body`, section.body || "", "p")}
+        </div>
+      </div>
+    </section>
+  `;
+}
+
+function renderStats(section, basePath) {
+  const items = (section.items || [])
+    .map(
+      (item, index) => `
+        <article class="landing-card landing-page-stat reveal">
+          <strong>${escapeHtml(item.value || "")}</strong>
+          ${createEditableMarkup(`${basePath}.items.${index}.label`, item.label || "", "span", "landing-page-stat-label")}
+        </article>
+      `
+    )
+    .join("");
+
+  return `
+    <section class="landing-section">
+      <div class="landing-section-head reveal">
+        <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath}.title`, section.title || "", "h2")}
+      </div>
+      <div class="landing-page-stats">${items}</div>
+    </section>
+  `;
+}
+
+function renderList(section, basePath) {
+  const items = (section.items || [])
+    .map(
+      (item, index) => `<li class="reveal">${createEditableMarkup(`${basePath}.items.${index}`, item, "span")}</li>`
+    )
+    .join("");
+
+  return `
+    <section class="landing-section">
+      <div class="landing-section-head reveal landing-section-head-left">
+        <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath}.title`, section.title || "", "h2")}
+      </div>
+      <ul class="bullet-list">${items}</ul>
+    </section>
+  `;
+}
+
+function renderTimeline(section, basePath) {
+  const items = (section.items || [])
+    .map(
+      (item, index) => `
+        <article class="timeline-item reveal">
+          <span class="timeline-year">${escapeHtml(item.year || "")}</span>
+          <div class="timeline-copy">
+            ${createEditableMarkup(`${basePath}.items.${index}.body`, item.body || "", "p")}
+          </div>
+        </article>
+      `
+    )
+    .join("");
+
+  return `
+    <section class="landing-section">
+      <div class="landing-section-head reveal landing-section-head-left">
+        <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath}.title`, section.title || "", "h2")}
+      </div>
+      <div class="timeline-list">${items}</div>
+    </section>
+  `;
+}
+
+function renderFaq(section, basePath) {
+  const items = (section.items || [])
+    .map(
+      (item, index) => `
+        <details class="faq-item reveal">
+          <summary>${escapeHtml(item.question || "")}</summary>
+          ${createEditableMarkup(`${basePath}.items.${index}.answer`, item.answer || "", "p")}
+        </details>
+      `
+    )
+    .join("");
+
+  return `
+    <section class="landing-section">
+      <div class="landing-section-head reveal landing-section-head-left">
+        <span class="landing-kicker">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath}.title`, section.title || "", "h2")}
+      </div>
+      <div class="faq-list">${items}</div>
+    </section>
+  `;
+}
+
+function renderCta(section, basePath) {
+  const actions = (section.actions || [])
+    .map(
+      (action) =>
+        `<a href="${escapeHtml(action.href)}" class="btn ${action.secondary ? "btn-ghost light-ghost" : "btn-primary"}">${escapeHtml(action.label)}</a>`
+    )
+    .join("");
+
+  return `
+    <section class="landing-cta">
+      <div class="landing-cta-inner reveal">
+        <span class="landing-eyebrow light-eyebrow">${escapeHtml(section.kicker || "")}</span>
+        ${createEditableMarkup(`${basePath}.title`, section.title || "", "h2")}
+        ${createEditableMarkup(`${basePath}.body`, section.body || "", "p")}
+        <div class="landing-hero-cta">${actions}</div>
+      </div>
+    </section>
+  `;
+}
+
+function getSectionItems(section, data) {
+  if (!section.source) return section.items || [];
+  return data[section.source] || [];
+}
+
+function getSectionBasePath(sectionIndex) {
+  return `sections.${sectionIndex}`;
+}
+
+function sectionRenderer(section, sectionIndex, data) {
+  const basePath = getSectionBasePath(sectionIndex);
+  if (section.layout === "story") return renderStory(section, basePath);
+  if (section.layout === "stats") return renderStats(section, basePath);
+  if (section.layout === "list") return renderList(section, basePath);
+  if (section.layout === "timeline") return renderTimeline(section, basePath);
+  if (section.layout === "faq") return renderFaq(section, basePath);
+  if (section.layout === "cta") return renderCta(section, basePath);
+  if (section.layout === "people") return renderPeople(section, getSectionItems(section, data), `${basePath}.items`);
+  if (section.layout === "cards") return renderCards(section, getSectionItems(section, data), `${basePath}.items`);
+  return "";
+}
+
+async function saveCurrentPage() {
+  return;
+}
+
+async function saveRecord(type, record) {
+  return record;
+}
+
+function bindInlineEditing() {
+  return;
+}
+
+function setupReveal() {
+  const elements = document.querySelectorAll(".reveal");
+  if (!elements.length || !("IntersectionObserver" in window)) {
+    elements.forEach((element) => element.classList.add("is-visible"));
+    return;
+  }
+
+  const observer = new IntersectionObserver(
+    (entries) => {
+      entries.forEach((entry) => {
+        if (!entry.isIntersecting) return;
+        entry.target.classList.add("is-visible");
+        observer.unobserve(entry.target);
+      });
+    },
+    { threshold: 0.16 }
+  );
+
+  elements.forEach((element) => observer.observe(element));
+}
+
+function setupTiltCards(selectors) {
+  selectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((card) => {
+      card.addEventListener("pointermove", (event) => {
+        const rect = card.getBoundingClientRect();
+        const px = (event.clientX - rect.left) / rect.width;
+        const py = (event.clientY - rect.top) / rect.height;
+        const rx = (py - 0.5) * -8;
+        const ry = (px - 0.5) * 10;
+        card.style.setProperty("--tilt-x", `${rx.toFixed(2)}deg`);
+        card.style.setProperty("--tilt-y", `${ry.toFixed(2)}deg`);
+        card.style.setProperty("--glow-x", `${(px * 100).toFixed(1)}%`);
+        card.style.setProperty("--glow-y", `${(py * 100).toFixed(1)}%`);
+      });
+
+      card.addEventListener("pointerleave", () => {
+        card.style.removeProperty("--tilt-x");
+        card.style.removeProperty("--tilt-y");
+        card.style.removeProperty("--glow-x");
+        card.style.removeProperty("--glow-y");
+      });
+    });
+  });
+}
+
+function setupVisualParallax(selector, xVar, yVar) {
+  const visual = document.querySelector(selector);
+  if (!visual) return;
+
+  visual.addEventListener("pointermove", (event) => {
+    const rect = visual.getBoundingClientRect();
+    const px = (event.clientX - rect.left) / rect.width;
+    const py = (event.clientY - rect.top) / rect.height;
+    visual.style.setProperty(xVar, `${(px - 0.5) * 16}px`);
+    visual.style.setProperty(yVar, `${(py - 0.5) * 12}px`);
+  });
+
+  visual.addEventListener("pointerleave", () => {
+    visual.style.removeProperty(xVar);
+    visual.style.removeProperty(yVar);
+  });
+}
+
+function setupDynamicPage() {
+  if (pageName === "about") {
+    setupVisualParallax(".about-rpa-visual", "--about-x", "--about-y");
+    setupTiltCards([".about-rpa-info", ".about-rpa-do-card", ".about-rpa-person-card", ".about-rpa-milestone"]);
+    return;
+  }
+
+  if (pageName === "districts") {
+    setupVisualParallax(".districts-rpa-visual", "--districts-x", "--districts-y");
+    setupTiltCards([".districts-rpa-stat", ".districts-rpa-card", ".districts-rpa-roadmap-card"]);
+    return;
+  }
+
+  if (pageName === "membership") {
+    setupVisualParallax(".membership-rpa-visual", "--membership-x", "--membership-y");
+    setupTiltCards([".membership-benefit-card", ".membership-plan-card", ".membership-process-card"]);
+    return;
+  }
+
+  if (pageName === "media") {
+    setupVisualParallax(".media-rpa-visual", "--media-x", "--media-y");
+    setupTiltCards([".media-gallery-card", ".membership-benefit-card"]);
+    return;
+  }
+
+  if (pageName === "contact") {
+    setupVisualParallax(".contact-rpa-visual", "--contact-x", "--contact-y");
+    setupTiltCards([".contact-rpa-card", ".contact-rpa-detail-row", ".card-shell"]);
+  }
+}
+
+function setupGalleryLightbox() {
+  const roots = document.querySelectorAll("[data-gallery-root]");
+  if (!roots.length) return;
+
+  const links = Array.from(document.querySelectorAll("[data-gallery-item]"));
+  if (!links.length) return;
+
+  const items = links
+    .map((el) => ({
+      src: el.getAttribute("data-gallery-src") || "",
+      title: el.getAttribute("data-gallery-title") || "",
+      href: el.getAttribute("href") || ""
+    }))
+    .filter((item) => item.src);
+
+  if (!items.length) return;
+
+  const overlay = document.createElement("div");
+  overlay.className = "gallery-lightbox";
+  overlay.hidden = true;
+  overlay.innerHTML = `
+    <div class="gallery-lightbox__backdrop" data-gallery-close></div>
+    <div class="gallery-lightbox__panel" role="dialog" aria-modal="true" aria-label="Gallery viewer">
+      <button class="gallery-lightbox__close" type="button" aria-label="Close" data-gallery-close>×</button>
+      <button class="gallery-lightbox__nav gallery-lightbox__prev" type="button" aria-label="Previous" data-gallery-prev>‹</button>
+      <figure class="gallery-lightbox__figure">
+        <img class="gallery-lightbox__img" alt="" />
+        <figcaption class="gallery-lightbox__caption"></figcaption>
+      </figure>
+      <button class="gallery-lightbox__nav gallery-lightbox__next" type="button" aria-label="Next" data-gallery-next>›</button>
+    </div>
+  `;
+  document.body.append(overlay);
+
+  const img = overlay.querySelector(".gallery-lightbox__img");
+  const caption = overlay.querySelector(".gallery-lightbox__caption");
+  const closeEls = overlay.querySelectorAll("[data-gallery-close]");
+  const prevBtn = overlay.querySelector("[data-gallery-prev]");
+  const nextBtn = overlay.querySelector("[data-gallery-next]");
+
+  let index = 0;
+
+  function render() {
+    const item = items[index];
+    if (!item) return;
+    img.src = item.src;
+    img.alt = item.title || "Gallery image";
+    caption.textContent = item.title || "";
+  }
+
+  function open(nextIndex) {
+    index = Math.max(0, Math.min(items.length - 1, nextIndex));
+    render();
+    overlay.hidden = false;
+    document.body.style.overflow = "hidden";
+  }
+
+  function close() {
+    overlay.hidden = true;
+    document.body.style.overflow = "";
+  }
+
+  function prev() {
+    open((index - 1 + items.length) % items.length);
+  }
+
+  function next() {
+    open((index + 1) % items.length);
+  }
+
+  links.forEach((el, idx) => {
+    el.addEventListener("click", (event) => {
+      event.preventDefault();
+      open(idx);
+    });
+  });
+
+  closeEls.forEach((el) => el.addEventListener("click", close));
+  prevBtn?.addEventListener("click", prev);
+  nextBtn?.addEventListener("click", next);
+
+  window.addEventListener("keydown", (event) => {
+    if (overlay.hidden) return;
+    if (event.key === "Escape") close();
+    if (event.key === "ArrowLeft") prev();
+    if (event.key === "ArrowRight") next();
+  });
+
+  const params = new URLSearchParams(window.location.search);
+  const imgIndex = params.get("img");
+  if (imgIndex != null) {
+    const asNumber = Number(imgIndex);
+    if (Number.isFinite(asNumber)) {
+      open(Math.max(0, Math.min(items.length - 1, Math.trunc(asNumber))));
+    }
+  }
+}
+
+async function loadPage() {
+  try {
+    const [pageResponse, sessionResponse] = await Promise.all([
+      fetch(`/api/public/bootstrap?page=${encodeURIComponent(pageName)}`),
+      fetch("/api/auth/me")
+    ]);
+
+    const data = await pageResponse.json();
+    currentSession = await sessionResponse.json();
+    currentPage = data.page;
+    currentData = data;
+    renderPage();
+    maybeShowAuthPrompt(currentSession);
+  } finally {
+    // Loader intentionally disabled.
+  }
+}
+
+function renderPage() {
+  renderAuthActions(currentSession);
+  if (footerBlurb) {
+    footerBlurb.textContent =
+      currentPage?.footerBlurb || "Official home for district growth, tournaments, and public communication across Rajasthan.";
+  }
+  if (pageName === "about") {
+    root.innerHTML = renderAboutCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "tournaments") {
+    root.innerHTML = renderTournamentsCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "membership") {
+    root.innerHTML = renderMembershipCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "districts") {
+    root.innerHTML = renderDistrictsCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "media" || pageName === "news") {
+    root.innerHTML = renderMediaCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    setupGalleryLightbox();
+    return;
+  }
+  if (pageName === "contact") {
+    root.innerHTML = renderContactCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    setupGalleryLightbox();
+    return;
+  }
+  const sections = (currentPage.sections || [])
+    .map((section, index) => sectionRenderer(section, index, currentData))
+    .join("");
+  root.innerHTML = `${renderPageHero(currentPage.hero)}${sections}`;
+  setupReveal();
+  setupDynamicPage();
+}
+
+function rerenderPage() {
+  renderPage();
+}
+
+if (root && pageName) {
+  loadPage().catch(() => {
+    root.innerHTML = `
+      <section class="landing-section">
+        <div class="landing-section-head landing-section-head-left">
+          <span class="landing-kicker">Content Error</span>
+          <h2>We could not load this page right now.</h2>
+          <p>Please check the local server or Airtable configuration and try again.</p>
+        </div>
+      </section>
+    `;
+  });
+}
+
+navToggle?.addEventListener("click", () => {
+  const expanded = navToggle.getAttribute("aria-expanded") === "true";
+  navToggle.setAttribute("aria-expanded", String(!expanded));
+  navLinks?.classList.toggle("is-open", !expanded);
+  authActions?.classList.toggle("is-open", !expanded);
+});
