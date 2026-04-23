@@ -714,6 +714,27 @@ p {
   border-bottom: 1px solid rgba(17, 33, 39, 0.08);
 }
 
+.landing-nav .brand-logo,
+.rpa-footer .brand-logo {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 0;
+  box-shadow: none;
+}
+
+.landing-nav .brand-text strong {
+  color: #14606b;
+  font-size: 1rem;
+}
+
+.landing-nav .brand-text span {
+  color: #35555d;
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+}
+
 .landing-nav-links {
   display: flex;
   gap: 1.4rem;

@@ -7,7 +7,6 @@
     { "source": "/tournaments", "destination": "/tournaments.html" },
     { "source": "/membership", "destination": "/membership.html" },
     { "source": "/districts", "destination": "/districts.html" },
-    { "source": "/media", "destination": "/media.html" },
     { "source": "/contact", "destination": "/contact.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/terms", "destination": "/terms.html" }

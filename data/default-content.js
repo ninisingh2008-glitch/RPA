@@ -631,7 +631,7 @@ const news = [
     category: "Media Update",
     date: "2026-04-08",
     summary: "Latest event visuals, district activity photos and feature stories are now available in the media gallery.",
-    link: "media.html",
+    link: "contact.html#contact-gallery",
     image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=1200"
   }
 ];

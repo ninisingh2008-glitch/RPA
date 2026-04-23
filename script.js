@@ -484,7 +484,7 @@ function renderHome(data) {
             <div class="rpa-section-head">
               <span></span>
               <h2>Our Community In Action</h2>
-              <a href="media.html">View gallery</a>
+              <a href="contact.html#contact-gallery">View gallery</a>
             </div>
             <div class="rpa-gallery-grid">
               ${renderGallery(data.news || [])}

@@ -570,7 +570,7 @@ function renderTournamentsCustomPage(page, data) {
         <div class="tourneys-rpa-section">
           <div class="tourneys-rpa-section-head">
             <h2>Past Events / Results</h2>
-            <a href="media.html">View all results</a>
+            <a href="contact.html#contact-gallery">View all results</a>
           </div>
           <div class="tourneys-results-grid">
             ${fallbackImages
@@ -947,7 +947,7 @@ function renderMediaCustomPage(page, data) {
               const image = item.image || "";
               const title = item.title || "Gallery image";
               const category = item.category || "";
-              const href = `media.html?img=${encodeURIComponent(String(index))}#media-gallery`;
+              const href = `contact.html?img=${encodeURIComponent(String(index))}#contact-gallery`;
               return `
                 <a class="media-gallery-card" href="${href}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
                   image
@@ -1033,7 +1033,7 @@ function renderContactCustomPage(page, data) {
           .join("")}
       </section>
 
-      <section class="contact-rpa-gallery reveal" aria-label="Gallery" data-gallery-root>
+      <section class="contact-rpa-gallery reveal" id="contact-gallery" aria-label="Gallery" data-gallery-root>
         <div class="about-rpa-section-head">
           <h2>Gallery</h2>
         </div>
@@ -1044,7 +1044,7 @@ function renderContactCustomPage(page, data) {
               const image = item.image || "";
               const title = item.title || "Gallery image";
               const category = item.category || "";
-              const href = `media.html?img=${encodeURIComponent(String(index))}#media-gallery`;
+              const href = `contact.html?img=${encodeURIComponent(String(index))}#contact-gallery`;
               return `
                 <a class="media-gallery-card" href="${href}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
                   image
