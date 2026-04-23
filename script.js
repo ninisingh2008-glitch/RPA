@@ -549,7 +549,7 @@ async function loadHome() {
           <section class="rpa-empty-state">
             <span class="rpa-pill">Content Error</span>
             <h1>We could not load the home page right now.</h1>
-            <p>Please check the local server and try again.</p>
+            <p>Please refresh in a moment. If this keeps happening, the live content service may be unavailable.</p>
           </section>
         </div>
       </section>
