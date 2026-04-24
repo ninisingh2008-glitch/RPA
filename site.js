@@ -38,6 +38,18 @@ function formatDate(value) {
   }).format(date);
 }
 
+function renderErrorPage(message, details = null) {
+  return `
+    <section class="error-page">
+      <div class="error-card">
+        <h1>Unable to load content</h1>
+        <p>${escapeHtml(message)}</p>
+        ${details ? `<pre class="error-details">${escapeHtml(details)}</pre>` : ""}
+      </div>
+    </section>
+  `;
+}
+
 function slugify(value) {
   return String(value || "")
     .toLowerCase()
@@ -1835,11 +1847,22 @@ async function loadPage() {
     ]);
 
     const data = await pageResponse.json();
+    if (!pageResponse.ok || data?.error) {
+      root.innerHTML = renderErrorPage(
+        data?.error || `Bootstrap request failed with status ${pageResponse.status}`,
+        JSON.stringify(data, null, 2)
+      );
+      return;
+    }
+
     currentSession = await sessionResponse.json();
     currentPage = data.page;
     currentData = data;
     renderPage();
     maybeShowAuthPrompt(currentSession);
+  } catch (error) {
+    root.innerHTML = renderErrorPage(error?.message || "Unknown load error");
+    console.error("Failed to load page:", error);
   } finally {
     // Loader intentionally disabled.
   }
