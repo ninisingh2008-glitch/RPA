@@ -233,6 +233,7 @@ function renderTournamentCards(tournaments) {
       const image = event.image || fallbackImages[index % fallbackImages.length];
       return `
         <article class="rpa-tournament-card reveal rpa-tournament-card--${tone}">
+          <a href="tournaments.html?id=${encodeURIComponent(recordKey(event, index))}" class="rpa-home-card-link">
           <div class="rpa-card-illustration">
             <img src="${escapeHtml(image)}" alt="${escapeHtml(event.name || "Tournament image")}" class="rpa-tournament-image" />
           </div>
@@ -241,6 +242,7 @@ function renderTournamentCards(tournaments) {
             <p>${escapeHtml(formatRange(event.date))}</p>
             <span>${escapeHtml(event.city || event.venue || "Rajasthan")}</span>
           </div>
+          </a>
         </article>
       `;
     })
@@ -269,7 +271,11 @@ function renderFeatureCards(features) {
     .join("");
 }
 
-function renderGallery(news) {
+function recordKey(record, fallback = "") {
+  return record?.slug || record?.id || String(record?.title || record?.name || fallback || "").toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
+}
+
+function renderGallery(galleryEvents) {
   const fallback = [
     {
       title: "Pickleball match on blue court",
@@ -288,18 +294,18 @@ function renderGallery(news) {
     }
   ];
 
-  return (news?.length ? news : fallback)
+  return (galleryEvents?.length ? galleryEvents : fallback)
     .slice(0, 3)
     .map(
       (item, index) => `
-        <article class="rpa-gallery-card reveal rpa-gallery-card--${(index % 4) + 1}">
+        <a href="news.html?id=${encodeURIComponent(recordKey(item, index))}" class="rpa-gallery-card reveal rpa-gallery-card--${(index % 4) + 1}">
           <img
-            src="${escapeHtml(item.image || fallback[index % fallback.length].image)}"
+            src="${escapeHtml(item.coverImage || item.image || fallback[index % fallback.length].image)}"
             alt="${escapeHtml(item.title || item.summary || "Community action image")}"
             class="rpa-gallery-image"
             loading="lazy"
           />
-        </article>
+        </a>
       `
     )
     .join("");
@@ -484,10 +490,10 @@ function renderHome(data) {
             <div class="rpa-section-head">
               <span></span>
               <h2>Our Community In Action</h2>
-              <a href="contact.html#contact-gallery">View gallery</a>
+              <a href="news.html">View gallery</a>
             </div>
             <div class="rpa-gallery-grid">
-              ${renderGallery(data.news || [])}
+              ${renderGallery(data.galleryEvents || data.news || [])}
             </div>
           </div>
 

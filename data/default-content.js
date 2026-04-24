@@ -631,7 +631,7 @@ const news = [
     category: "Media Update",
     date: "2026-04-08",
     summary: "Latest event visuals, district activity photos and feature stories are now available in the media gallery.",
-    link: "contact.html#contact-gallery",
+    link: "news.html",
     image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=1200"
   }
 ];
@@ -660,6 +660,77 @@ const partners = [
   }
 ];
 
+const galleryEvents = [
+  {
+    id: "gallery-1",
+    slug: "jaipur-open-gallery",
+    title: "Jaipur Open Gallery",
+    category: "Tournament",
+    date: "2026-05-01",
+    location: "Jaipur",
+    summary: "Match action, podium moments, and community highlights from the Jaipur Open.",
+    coverImage: "assets/Tournaments Main Image.png",
+    status: "Published"
+  },
+  {
+    id: "gallery-2",
+    slug: "district-clinic-highlights",
+    title: "District Clinic Highlights",
+    category: "Community",
+    date: "2026-04-18",
+    location: "Rajasthan",
+    summary: "Training, coaching, and participation moments from district development sessions.",
+    coverImage: "assets/Districts Main Image.png",
+    status: "Published"
+  },
+  {
+    id: "gallery-3",
+    slug: "state-event-visuals",
+    title: "State Event Visuals",
+    category: "Media",
+    date: "2026-04-08",
+    location: "Rajasthan",
+    summary: "A visual record of recent official state activity and community moments.",
+    coverImage: "assets/Contact Main Image.png",
+    status: "Published"
+  }
+];
+
+const galleryImages = [
+  {
+    id: "gallery-img-1",
+    eventId: "gallery-1",
+    url: "assets/Tournaments Main Image.png",
+    alt: "Players competing at a sports event",
+    caption: "Opening matches in Jaipur.",
+    sortOrder: 1
+  },
+  {
+    id: "gallery-img-2",
+    eventId: "gallery-1",
+    url: "assets/Index Main Image.png",
+    alt: "Athletes on court",
+    caption: "Doubles action from the event.",
+    sortOrder: 2
+  },
+  {
+    id: "gallery-img-3",
+    eventId: "gallery-2",
+    url: "assets/Districts Main Image.png",
+    alt: "Community sports session",
+    caption: "District training session.",
+    sortOrder: 1
+  },
+  {
+    id: "gallery-img-4",
+    eventId: "gallery-3",
+    url: "assets/Contact Main Image.png",
+    alt: "Rajasthan event setting",
+    caption: "State event atmosphere.",
+    sortOrder: 1
+  }
+];
+
 const users = [
   {
     id: "user-rpa-admin",
@@ -678,5 +749,7 @@ module.exports = {
   team,
   news,
   partners,
+  galleryEvents,
+  galleryImages,
   users
 };

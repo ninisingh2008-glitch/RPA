@@ -4,8 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "node server.js",
-    "start": "node server.js",
-    "setup:airtable": "node scripts/setup-airtable.js",
-    "seed:airtable": "node scripts/seed-airtable.js"
+    "start": "node server.js"
   }
 }

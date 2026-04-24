@@ -38,6 +38,39 @@ function formatDate(value) {
   }).format(date);
 }
 
+function slugify(value) {
+  return String(value || "")
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function recordKey(record, fallback = "") {
+  return record?.slug || record?.id || slugify(record?.name || record?.title || fallback);
+}
+
+function getSelectedRecord(records, nameField = "name") {
+  const params = new URLSearchParams(window.location.search);
+  const selected = params.get("id") || params.get("event") || params.get("slug");
+  if (!selected) return null;
+  const normalized = slugify(selected);
+  return (records || []).find((record) => {
+    const keys = [record.id, record.slug, record[nameField], record.title, slugify(record[nameField] || record.title || "")];
+    return keys.some((key) => String(key || "") === selected || slugify(key) === normalized);
+  });
+}
+
+function imageForTournament(item, index = 0) {
+  const fallbackImages = [
+    "assets/Tournaments Main Image.png",
+    "assets/Index Main Image.png",
+    "assets/Districts Main Image.png",
+    "assets/Membership Main Image.png"
+  ];
+  return item?.image || fallbackImages[index % fallbackImages.length];
+}
+
 function initialsFor(value) {
   return String(value || "")
     .split(/\s+/)
@@ -430,9 +463,13 @@ function renderAboutCustomPage(page, data) {
 
 function renderTournamentsCustomPage(page, data) {
   const hero = page.hero || {};
-  const tournaments = (data.tournaments || []).slice(0, 3);
-  const featured = tournaments[1] || tournaments[0] || {};
-  const calendar = tournaments.length ? tournaments : [];
+  const allTournaments = data.tournaments || [];
+  const selectedTournament = getSelectedRecord(allTournaments, "name");
+  if (selectedTournament) return renderTournamentDetailPage(page, selectedTournament, allTournaments);
+
+  const tournaments = allTournaments.slice(0, 6);
+  const featured = allTournaments.find((item) => item.isFeatured) || tournaments[0] || {};
+  const calendar = allTournaments.length ? allTournaments : [];
   const categoryCards = [
     { icon: "map", title: "Open" },
     { icon: "people", title: "Juniors" },
@@ -444,12 +481,6 @@ function renderTournamentsCustomPage(page, data) {
     "Who can participate?",
     "What are the age categories?",
     "What are the rules followed?"
-  ];
-  const fallbackImages = [
-    "https://images.unsplash.com/photo-1517649763962-0c623066013b?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1547347298-4074fc3086f0?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1526232761682-d26e03ac148e?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1517466787929-bc90951d0974?auto=format&fit=crop&fm=jpg&q=80&w=1200"
   ];
 
   const heroActions = (hero.actions || [])
@@ -485,7 +516,7 @@ function renderTournamentsCustomPage(page, data) {
         </div>
         <article class="tourneys-featured">
           <img
-            src="${escapeHtml(fallbackImages[0])}"
+            src="${escapeHtml(imageForTournament(featured, 0))}"
             alt="${escapeHtml(featured.name || "Featured tournament")}"
             class="tourneys-featured-image"
           />
@@ -498,7 +529,7 @@ function renderTournamentsCustomPage(page, data) {
               <span>Mixed</span>
               <span>Doubles</span>
             </div>
-            <a href="${escapeHtml(featured.registrationLink || "contact.html")}" class="btn btn-primary">View Details</a>
+            <a href="tournaments.html?id=${encodeURIComponent(recordKey(featured))}" class="btn btn-primary">View Details</a>
           </div>
         </article>
       </section>
@@ -513,7 +544,8 @@ function renderTournamentsCustomPage(page, data) {
             .map(
               (item, index) => `
                 <article class="tourneys-card tourneys-card--${index + 1}">
-                  <img src="${escapeHtml(fallbackImages[(index + 1) % fallbackImages.length])}" alt="${escapeHtml(
+                  <a href="tournaments.html?id=${encodeURIComponent(recordKey(item))}" class="tourneys-card-link" aria-label="Open ${escapeHtml(item.name || "tournament")}">
+                  <img src="${escapeHtml(imageForTournament(item, index + 1))}" alt="${escapeHtml(
                     item.name || "Tournament image"
                   )}" class="tourneys-card-image" />
                   <div class="tourneys-card-copy">
@@ -521,6 +553,7 @@ function renderTournamentsCustomPage(page, data) {
                     <p>${escapeHtml(formatDate(item.date || ""))}</p>
                     <span>${escapeHtml(item.city || "")}</span>
                   </div>
+                  </a>
                 </article>
               `
             )
@@ -570,15 +603,18 @@ function renderTournamentsCustomPage(page, data) {
         <div class="tourneys-rpa-section">
           <div class="tourneys-rpa-section-head">
             <h2>Past Events / Results</h2>
-            <a href="contact.html#contact-gallery">View all results</a>
+            <a href="news.html">View all results</a>
           </div>
           <div class="tourneys-results-grid">
-            ${fallbackImages
+            ${(allTournaments.length ? allTournaments : [])
+              .slice(0, 4)
               .map(
-                (image, index) => `
+                (item, index) => `
                   <article class="tourneys-result-card">
-                    <img src="${escapeHtml(image)}" alt="Past tournament" class="tourneys-result-image" />
-                    <h3>${escapeHtml(["Rajasthan State Championship 2024", "Ajmer Open 2024", "Bikaner Open 2024", "Alwar Cup 2024"][index])}</h3>
+                    <a href="tournaments.html?id=${encodeURIComponent(recordKey(item))}" class="tourneys-card-link">
+                    <img src="${escapeHtml(imageForTournament(item, index))}" alt="${escapeHtml(item.name || "Tournament")}" class="tourneys-result-image" />
+                    <h3>${escapeHtml(item.name || "Tournament")}</h3>
+                    </a>
                   </article>
                 `
               )
@@ -615,6 +651,104 @@ function renderTournamentsCustomPage(page, data) {
           <a href="contact.html" class="btn btn-outline-light">Tournament Enquiries</a>
         </div>
       </section>
+    </section>
+  `;
+}
+
+function renderTournamentDetailPage(page, tournament, allTournaments) {
+  const related = (allTournaments || []).filter((item) => item.id !== tournament.id).slice(0, 3);
+  const detailRows = [
+    { label: "Date", value: formatDate(tournament.date) || "TBA" },
+    { label: "City", value: tournament.city || "Rajasthan" },
+    { label: "Venue", value: tournament.venue || "Venue TBA" },
+    { label: "Category", value: tournament.category || "Tournament" },
+    { label: "Status", value: tournament.status || "Upcoming" },
+    { label: "Fee", value: tournament.fee || "" }
+  ].filter((item) => item.value);
+
+  return `
+    <section class="tourneys-rpa">
+      <section class="tourneys-detail-hero reveal">
+        <a href="tournaments.html" class="tourneys-back-link">Back to all tournaments</a>
+        <div class="tourneys-detail-grid">
+          <div class="tourneys-detail-copy">
+            <span class="rpa-pill">${escapeHtml(tournament.category || "Tournament")}</span>
+            <h1>${escapeHtml(tournament.name || "Tournament")}</h1>
+            <p>${escapeHtml(
+              tournament.description ||
+                "Tournament details, schedule information, registration notes, and official updates will appear here."
+            )}</p>
+            <div class="tourneys-rpa-actions">
+              <a href="${escapeHtml(tournament.registrationLink || "contact.html")}" class="btn btn-primary">Register / Enquire</a>
+              <a href="news.html" class="btn btn-ghost">Open Gallery</a>
+            </div>
+          </div>
+          <img src="${escapeHtml(imageForTournament(tournament, 0))}" alt="${escapeHtml(tournament.name || "Tournament")}" class="tourneys-detail-image" />
+        </div>
+      </section>
+
+      <section class="tourneys-rpa-columns reveal">
+        <div class="tourneys-rpa-section">
+          <div class="tourneys-rpa-section-head">
+            <h2>Event Details</h2>
+          </div>
+          <div class="tourneys-detail-list">
+            ${detailRows
+              .map(
+                (item) => `
+                  <article class="tourneys-detail-row">
+                    <span>${escapeHtml(item.label)}</span>
+                    <strong>${escapeHtml(item.value)}</strong>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="tourneys-rpa-section">
+          <div class="tourneys-rpa-section-head">
+            <h2>Rules & Notes</h2>
+          </div>
+          <div class="tourneys-detail-note">
+            <p>${escapeHtml(
+              tournament.rules ||
+                "Rules, eligibility, category notes, and check-in instructions can be added from Supabase for this tournament."
+            )}</p>
+            ${tournament.contact ? `<p><strong>Contact:</strong> ${escapeHtml(tournament.contact)}</p>` : ""}
+          </div>
+        </div>
+      </section>
+
+      ${
+        related.length
+          ? `
+            <section class="tourneys-rpa-section reveal">
+              <div class="tourneys-rpa-section-head">
+                <h2>More Tournaments</h2>
+                <a href="tournaments.html">View all</a>
+              </div>
+              <div class="tourneys-rpa-grid">
+                ${related
+                  .map(
+                    (item, index) => `
+                      <article class="tourneys-card tourneys-card--${index + 1}">
+                        <a href="tournaments.html?id=${encodeURIComponent(recordKey(item))}" class="tourneys-card-link">
+                          <img src="${escapeHtml(imageForTournament(item, index + 1))}" alt="${escapeHtml(item.name || "Tournament")}" class="tourneys-card-image" />
+                          <div class="tourneys-card-copy">
+                            <h3>${escapeHtml(item.name || "")}</h3>
+                            <p>${escapeHtml(formatDate(item.date || ""))}</p>
+                            <span>${escapeHtml(item.city || "")}</span>
+                          </div>
+                        </a>
+                      </article>
+                    `
+                  )
+                  .join("")}
+              </div>
+            </section>
+          `
+          : ""
+      }
     </section>
   `;
 }
@@ -892,7 +1026,7 @@ function renderMembershipCustomPage(page) {
 function renderMediaCustomPage(page, data) {
   const hero = page.hero || {};
   const sections = page.sections || [];
-  const galleryItems = (data.news || []).filter((item) => item.image);
+  const galleryItems = (data.galleryEvents || []).filter((item) => item.coverImage);
   const galleryFallback = [
     {
       title: "Jaipur Open gallery",
@@ -933,7 +1067,7 @@ function renderMediaCustomPage(page, data) {
           <div class="media-rpa-actions">${heroActions}</div>
         </div>
         <div class="media-rpa-visual">
-          <img src="assets/Media Main Image.png" alt="Media page visual" class="media-rpa-image" />
+          <img src="assets/Contact Main Image.png" alt="Media page visual" class="media-rpa-image" />
         </div>
       </section>
 
@@ -944,14 +1078,12 @@ function renderMediaCustomPage(page, data) {
         <div class="media-gallery-grid">
           ${(galleryItems.length ? galleryItems : galleryFallback)
             .map((item, index) => {
-              const image = item.image || "";
-              const title = item.title || "Gallery image";
+              const image = item.coverImage || "";
+              const title = item.title || "Gallery event";
               const category = item.category || "";
-              const href = `contact.html?img=${encodeURIComponent(String(index))}#contact-gallery`;
+              const href = `news.html?id=${encodeURIComponent(recordKey(item))}`;
               return `
-                <a class="media-gallery-card" href="${href}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
-                  image
-                )}" data-gallery-title="${escapeHtml(title)}">
+                <a class="media-gallery-card" href="${href}">
                   <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" class="media-gallery-image" />
                   <div class="media-gallery-copy">
                     <h3>${escapeHtml(title)}</h3>
@@ -967,13 +1099,122 @@ function renderMediaCustomPage(page, data) {
   `;
 }
 
+function renderGalleryEventsPage(page, data) {
+  const hero = page.hero || {};
+  const events = data.galleryEvents || [];
+  const selectedEvent = getSelectedRecord(events, "title");
+  if (selectedEvent) return renderGalleryEventDetailPage(page, selectedEvent, data.galleryImages || [], events);
+
+  return `
+    <section class="media-rpa">
+      <section class="media-rpa-hero reveal">
+        <div class="media-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Gallery")}</span>
+          <h1>
+            Event
+            <span>Gallery</span>
+          </h1>
+          <p>${escapeHtml(
+            hero.description || "Open an event gallery to see all photos added from Supabase."
+          )}</p>
+          <div class="media-rpa-actions">
+            <a href="tournaments.html" class="btn btn-primary">View Tournaments</a>
+            <a href="contact.html" class="btn btn-ghost">Media Enquiries</a>
+          </div>
+        </div>
+        <div class="media-rpa-visual">
+          <img src="assets/Contact Main Image.png" alt="Rajasthan pickleball gallery" class="media-rpa-image" />
+        </div>
+      </section>
+
+      <section class="media-rpa-section reveal" id="media-gallery">
+        <div class="about-rpa-section-head">
+          <h2>Gallery Events</h2>
+        </div>
+        <div class="media-gallery-grid">
+          ${events
+            .map(
+              (item) => `
+                <a class="media-gallery-card" href="news.html?id=${encodeURIComponent(recordKey(item))}">
+                  <img src="${escapeHtml(item.coverImage || "assets/logo.jpeg")}" alt="${escapeHtml(item.title || "Gallery event")}" class="media-gallery-image" />
+                  <div class="media-gallery-copy">
+                    <h3>${escapeHtml(item.title || "")}</h3>
+                    <p>${escapeHtml([item.category, formatDate(item.date), item.location].filter(Boolean).join(" / "))}</p>
+                  </div>
+                </a>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderGalleryEventDetailPage(page, event, images, events) {
+  const eventImages = (images || [])
+    .filter((image) => String(image.eventId) === String(event.id))
+    .sort((a, b) => (a.sortOrder || 0) - (b.sortOrder || 0));
+  const displayImages = eventImages.length
+    ? eventImages
+    : [
+        {
+          id: "cover",
+          eventId: event.id,
+          url: event.coverImage,
+          alt: event.title,
+          caption: event.summary,
+          sortOrder: 0
+        }
+      ].filter((image) => image.url);
+
+  return `
+    <section class="media-rpa">
+      <section class="gallery-event-hero reveal">
+        <a href="news.html" class="tourneys-back-link">Back to gallery events</a>
+        <div class="gallery-event-head">
+          <div>
+            <span class="rpa-pill">${escapeHtml(event.category || "Gallery")}</span>
+            <h1>${escapeHtml(event.title || "Gallery Event")}</h1>
+            <p>${escapeHtml(event.summary || "All photos from this event are shown below.")}</p>
+          </div>
+          <div class="gallery-event-meta">
+            <span>${escapeHtml(formatDate(event.date) || "Date TBA")}</span>
+            <strong>${escapeHtml(event.location || "Rajasthan")}</strong>
+          </div>
+        </div>
+      </section>
+
+      <section class="media-rpa-section reveal" data-gallery-root>
+        <div class="about-rpa-section-head">
+          <h2>All Images</h2>
+        </div>
+        <div class="gallery-event-grid">
+          ${displayImages
+            .map(
+              (image, index) => `
+                <a class="gallery-event-image-card" href="${escapeHtml(image.url)}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
+                  image.url
+                )}" data-gallery-title="${escapeHtml(image.caption || image.alt || event.title || "Gallery image")}">
+                  <img src="${escapeHtml(image.url)}" alt="${escapeHtml(image.alt || image.caption || event.title || "Gallery image")}" class="gallery-event-image" loading="lazy" />
+                  ${image.caption ? `<span>${escapeHtml(image.caption)}</span>` : ""}
+                </a>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
 function renderContactCustomPage(page, data) {
   const hero = page.hero || {};
   const sections = page.sections || [];
   const enquiryCards = sections[0]?.items || [];
   const detailCards = sections[1]?.items || [];
   const faqs = sections.find((section) => section.layout === "faq")?.items || [];
-  const galleryItems = (data?.news || []).filter((item) => item.image);
+  const galleryItems = (data?.galleryEvents || []).filter((item) => item.coverImage);
   const galleryFallback = [
     {
       title: "Community sessions",
@@ -1041,14 +1282,12 @@ function renderContactCustomPage(page, data) {
           ${(galleryItems.length ? galleryItems : galleryFallback)
             .slice(0, 6)
             .map((item, index) => {
-              const image = item.image || "";
-              const title = item.title || "Gallery image";
+              const image = item.coverImage || "";
+              const title = item.title || "Gallery event";
               const category = item.category || "";
-              const href = `contact.html?img=${encodeURIComponent(String(index))}#contact-gallery`;
+              const href = `news.html?id=${encodeURIComponent(recordKey(item))}`;
               return `
-                <a class="media-gallery-card" href="${href}" data-gallery-item data-gallery-index="${index}" data-gallery-src="${escapeHtml(
-                  image
-                )}" data-gallery-title="${escapeHtml(title)}">
+                <a class="media-gallery-card" href="${href}">
                   <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" class="media-gallery-image" />
                   <div class="media-gallery-copy">
                     <h3>${escapeHtml(title)}</h3>
@@ -1478,6 +1717,12 @@ function setupDynamicPage() {
     return;
   }
 
+  if (pageName === "gallery") {
+    setupVisualParallax(".media-rpa-visual", "--media-x", "--media-y");
+    setupTiltCards([".media-gallery-card", ".gallery-event-image-card"]);
+    return;
+  }
+
   if (pageName === "contact") {
     setupVisualParallax(".contact-rpa-visual", "--contact-x", "--contact-y");
     setupTiltCards([".contact-rpa-card", ".contact-rpa-detail-row", ".card-shell"]);
@@ -1637,6 +1882,13 @@ function renderPage() {
     setupGalleryLightbox();
     return;
   }
+  if (pageName === "gallery") {
+    root.innerHTML = renderGalleryEventsPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    setupGalleryLightbox();
+    return;
+  }
   if (pageName === "contact") {
     root.innerHTML = renderContactCustomPage(currentPage, currentData);
     setupReveal();
@@ -1663,7 +1915,7 @@ if (root && pageName) {
         <div class="landing-section-head landing-section-head-left">
           <span class="landing-kicker">Content Error</span>
           <h2>We could not load this page right now.</h2>
-          <p>Please check the local server or Airtable configuration and try again.</p>
+          <p>Please check the local server or Supabase configuration and try again.</p>
         </div>
       </section>
     `;
