@@ -503,8 +503,21 @@ function renderTournamentsCustomPage(page, data) {
     )
     .join("");
 
+  const debugBanner = allTournaments.length === 0
+    ? `
+      <section class="tourneys-debug-message reveal">
+        <div class="tourneys-debug-copy">
+          <strong>No tournaments were loaded from Supabase.</strong>
+          <p>Response included ${escapeHtml(String(currentData?.supabaseConfigured ? "Supabase configured" : "Supabase not configured"))}.</p>
+          <p>If these values are wrong, confirm your `/api/public/bootstrap` response and your Supabase project settings.</p>
+        </div>
+      </section>
+    `
+    : "";
+
   return `
     <section class="tourneys-rpa">
+${debugBanner}
       <section class="tourneys-rpa-hero reveal">
         <div class="tourneys-rpa-copy">
           <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Official RPA Events")}</span>
@@ -1847,9 +1860,22 @@ async function loadPage() {
     ]);
 
     const data = await pageResponse.json();
+    console.log("bootstrap response", pageResponse.status, data);
     if (!pageResponse.ok || data?.error) {
       root.innerHTML = renderErrorPage(
         data?.error || `Bootstrap request failed with status ${pageResponse.status}`,
+        JSON.stringify(data, null, 2)
+      );
+      return;
+    }
+
+    if (
+      pageName === "tournaments" &&
+      Array.isArray(data?.tournaments) &&
+      data.tournaments.length === 0
+    ) {
+      root.innerHTML = renderErrorPage(
+        "No tournaments were loaded from Supabase.",
         JSON.stringify(data, null, 2)
       );
       return;
