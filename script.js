@@ -167,6 +167,15 @@ function setupDynamicHome() {
   setupTiltCards([".rpa-tournament-card", ".rpa-feature-card", ".rpa-gallery-card", ".rpa-testimonial-card"]);
 }
 
+function getLocalSession() {
+  try {
+    const user = JSON.parse(window.localStorage.getItem("rpaUser") || "null");
+    return user ? { authenticated: true, user } : { authenticated: false, user: null };
+  } catch {
+    return { authenticated: false, user: null };
+  }
+}
+
 function renderAuth(session) {
   if (!authActions) return;
 
@@ -185,7 +194,7 @@ function renderAuth(session) {
   `;
 
   document.getElementById("logoutBtn")?.addEventListener("click", async () => {
-    await fetch("/api/auth/logout", { method: "POST" });
+    window.localStorage.removeItem("rpaUser");
     window.location.reload();
   });
 }
@@ -538,16 +547,18 @@ async function loadHome() {
   if (!root) return;
 
   try {
-    const [bootstrapRes, sessionRes] = await Promise.all([
-      fetch("/api/public/bootstrap?page=home"),
-      fetch("/api/auth/me")
-    ]);
-
-    if (!bootstrapRes.ok) throw new Error("Could not load home content.");
-
-    const [bootstrap, session] = await Promise.all([bootstrapRes.json(), sessionRes.json()]);
-    renderAuth(session);
-    renderHome(bootstrap);
+    const defaults = window.RPA_DEFAULTS;
+    if (!defaults?.pages?.home) throw new Error("Local content is unavailable.");
+    renderAuth(getLocalSession());
+    renderHome({
+      page: defaults.pages.home,
+      tournaments: defaults.tournaments || [],
+      team: defaults.team || [],
+      news: defaults.news || [],
+      partners: defaults.partners || [],
+      galleryEvents: defaults.galleryEvents || [],
+      galleryImages: defaults.galleryImages || []
+    });
   } catch {
     root.innerHTML = `
       <section class="rpa-shell">
@@ -555,7 +566,7 @@ async function loadHome() {
           <section class="rpa-empty-state">
             <span class="rpa-pill">Content Error</span>
             <h1>We could not load the home page right now.</h1>
-            <p>Please refresh in a moment. If this keeps happening, the live content service may be unavailable.</p>
+            <p>Please refresh in a moment. If this keeps happening, confirm the local content file is loading.</p>
           </section>
         </div>
       </section>

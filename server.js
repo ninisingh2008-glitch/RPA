@@ -2,7 +2,6 @@ const http = require("http");
 const path = require("path");
 const { URL } = require("url");
 const fs = require("fs");
-const { handleApi } = require("./lib/api-handler");
 
 const root = __dirname;
 const port = Number(process.env.PORT || 3000);
@@ -17,11 +16,6 @@ const mime = {
   ".png": "image/png",
   ".svg": "image/svg+xml"
 };
-
-function sendJson(res, status, payload) {
-  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
-  res.end(JSON.stringify(payload));
-}
 
 function sendText(res, status, payload) {
   res.writeHead(status, { "Content-Type": "text/plain; charset=utf-8" });
@@ -50,13 +44,9 @@ function serveStatic(req, res, pathname) {
 const server = http.createServer(async (req, res) => {
   try {
     const parsed = new URL(req.url, `http://${req.headers.host}`);
-    if (parsed.pathname.startsWith("/api/")) {
-      await handleApi(req, res, parsed.pathname, parsed.searchParams);
-      return;
-    }
     serveStatic(req, res, parsed.pathname);
   } catch (error) {
-    sendJson(res, 500, { error: error.message });
+    sendText(res, 500, error.message);
   }
 });
 

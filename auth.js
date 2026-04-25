@@ -26,6 +26,18 @@ function showAccount(user) {
   accountAction.href = "index.html";
 }
 
+function saveLocalUser(user) {
+  window.localStorage.setItem("rpaUser", JSON.stringify(user));
+}
+
+function getLocalUser() {
+  try {
+    return JSON.parse(window.localStorage.getItem("rpaUser") || "null");
+  } catch {
+    return null;
+  }
+}
+
 loginTab?.addEventListener("click", () => setMode("login"));
 signupTab?.addEventListener("click", () => setMode("signup"));
 
@@ -37,57 +49,46 @@ loginForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   loginMessage.textContent = "";
   const form = new FormData(loginForm);
-  const response = await fetch("/api/auth/login", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      identifier: form.get("identifier"),
-      password: form.get("password")
-    })
-  });
-  const data = await response.json();
-  if (!response.ok) {
-    loginMessage.textContent = data.error || "Unable to login.";
+  const identifier = String(form.get("identifier") || "").trim();
+  if (!identifier) {
+    loginMessage.textContent = "Enter a username or email.";
     return;
   }
-  showAccount(data.user);
+
+  const user = {
+    fullName: identifier.includes("@") ? identifier.split("@")[0] : identifier,
+    username: identifier,
+    email: identifier.includes("@") ? identifier : "",
+    role: "member"
+  };
+  saveLocalUser(user);
+  showAccount(user);
 });
 
 signupForm?.addEventListener("submit", async (event) => {
   event.preventDefault();
   signupMessage.textContent = "";
   const form = new FormData(signupForm);
-  const response = await fetch("/api/auth/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      fullName: form.get("fullName"),
-      username: form.get("username"),
-      email: form.get("email"),
-      password: form.get("password")
-    })
-  });
-  const data = await response.json();
-  if (!response.ok) {
-    signupMessage.textContent = data.error || "Unable to create account.";
-    return;
-  }
-  signupMessage.textContent = "Account created. You can log in now.";
+  const user = {
+    fullName: String(form.get("fullName") || "").trim(),
+    username: String(form.get("username") || "").trim(),
+    email: String(form.get("email") || "").trim(),
+    role: "member"
+  };
+  saveLocalUser(user);
+  signupMessage.textContent = "Account created on this browser.";
   signupForm.reset();
-  setMode("login");
+  showAccount(user);
 });
 
 logoutButton?.addEventListener("click", async () => {
-  await fetch("/api/auth/logout", { method: "POST" });
+  window.localStorage.removeItem("rpaUser");
   window.location.reload();
 });
 
 async function checkSession() {
-  const response = await fetch("/api/auth/me");
-  const data = await response.json();
-  if (data.authenticated && data.user) {
-    showAccount(data.user);
-  }
+  const user = getLocalUser();
+  if (user) showAccount(user);
 }
 
 checkSession();

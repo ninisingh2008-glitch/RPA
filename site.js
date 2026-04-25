@@ -154,6 +154,32 @@ function isAdminSession(session = currentSession) {
   return false;
 }
 
+function getLocalSession() {
+  try {
+    const user = JSON.parse(window.localStorage.getItem("rpaUser") || "null");
+    return user ? { authenticated: true, user } : { authenticated: false, user: null };
+  } catch {
+    return { authenticated: false, user: null };
+  }
+}
+
+function getLocalBootstrap(page) {
+  const defaults = window.RPA_DEFAULTS;
+  if (!defaults?.pages?.[page]) {
+    throw new Error(`Local content was not found for "${page}".`);
+  }
+
+  return {
+    page: deepClone(defaults.pages[page]),
+    tournaments: deepClone(defaults.tournaments || []),
+    team: deepClone(defaults.team || []),
+    news: deepClone(defaults.news || []),
+    partners: deepClone(defaults.partners || []),
+    galleryEvents: deepClone(defaults.galleryEvents || []),
+    galleryImages: deepClone(defaults.galleryImages || [])
+  };
+}
+
 function createEditableMarkup(path, value, tagName, className = "") {
   const text = escapeHtml(value || "");
   return `<${tagName}${className ? ` class="${className}"` : ""}>${text}</${tagName}>`;
@@ -336,12 +362,12 @@ function renderAboutCustomPage(page, data) {
   ];
 
   const portraitFallbacks = [
-    "https://randomuser.me/api/portraits/women/44.jpg",
-    "https://randomuser.me/api/portraits/men/32.jpg",
-    "https://randomuser.me/api/portraits/men/22.jpg",
-    "https://randomuser.me/api/portraits/women/68.jpg",
-    "https://randomuser.me/api/portraits/men/54.jpg",
-    "https://randomuser.me/api/portraits/men/76.jpg"
+    "assets/logo.jpeg",
+    "assets/logo.jpeg",
+    "assets/logo.jpeg",
+    "assets/logo.jpeg",
+    "assets/logo.jpeg",
+    "assets/logo.jpeg"
   ];
 
   const people = [...(peopleSection.items || data.team || [])];
@@ -507,9 +533,8 @@ function renderTournamentsCustomPage(page, data) {
     ? `
       <section class="tourneys-debug-message reveal">
         <div class="tourneys-debug-copy">
-          <strong>No tournaments were loaded from Supabase.</strong>
-          <p>Response included ${escapeHtml(String(currentData?.supabaseConfigured ? "Supabase configured" : "Supabase not configured"))}.</p>
-          <p>If these values are wrong, confirm your `/api/public/bootstrap` response and your Supabase project settings.</p>
+          <strong>No tournaments are available in local content.</strong>
+          <p>Add tournament entries in <code>data/default-content.js</code> to show them here.</p>
         </div>
       </section>
     `
@@ -737,7 +762,7 @@ function renderTournamentDetailPage(page, tournament, allTournaments) {
           <div class="tourneys-detail-note">
             <p>${escapeHtml(
               tournament.rules ||
-                "Rules, eligibility, category notes, and check-in instructions can be added from Supabase for this tournament."
+                "Rules, eligibility, category notes, and check-in instructions can be added in local content for this tournament."
             )}</p>
             ${tournament.contact ? `<p><strong>Contact:</strong> ${escapeHtml(tournament.contact)}</p>` : ""}
           </div>
@@ -1140,7 +1165,7 @@ function renderGalleryEventsPage(page, data) {
             <span>Gallery</span>
           </h1>
           <p>${escapeHtml(
-            hero.description || "Open an event gallery to see all photos added from Supabase."
+            hero.description || "Open an event gallery to see all locally published photos."
           )}</p>
           <div class="media-rpa-actions">
             <a href="tournaments.html" class="btn btn-primary">View Tournaments</a>
@@ -1854,34 +1879,8 @@ function setupGalleryLightbox() {
 
 async function loadPage() {
   try {
-    const [pageResponse, sessionResponse] = await Promise.all([
-      fetch(`/api/public/bootstrap?page=${encodeURIComponent(pageName)}`),
-      fetch("/api/auth/me")
-    ]);
-
-    const data = await pageResponse.json();
-    console.log("bootstrap response", pageResponse.status, data);
-    if (!pageResponse.ok || data?.error) {
-      root.innerHTML = renderErrorPage(
-        data?.error || `Bootstrap request failed with status ${pageResponse.status}`,
-        JSON.stringify(data, null, 2)
-      );
-      return;
-    }
-
-    if (
-      pageName === "tournaments" &&
-      Array.isArray(data?.tournaments) &&
-      data.tournaments.length === 0
-    ) {
-      root.innerHTML = renderErrorPage(
-        "No tournaments were loaded from Supabase.",
-        JSON.stringify(data, null, 2)
-      );
-      return;
-    }
-
-    currentSession = await sessionResponse.json();
+    const data = getLocalBootstrap(pageName);
+    currentSession = getLocalSession();
     currentPage = data.page;
     currentData = data;
     renderPage();
@@ -1964,7 +1963,7 @@ if (root && pageName) {
         <div class="landing-section-head landing-section-head-left">
           <span class="landing-kicker">Content Error</span>
           <h2>We could not load this page right now.</h2>
-          <p>Please check the local server or Supabase configuration and try again.</p>
+          <p>Please check that the local content file loaded and try again.</p>
         </div>
       </section>
     `;

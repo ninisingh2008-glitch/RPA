@@ -743,7 +743,7 @@ const users = [
   }
 ];
 
-module.exports = {
+const defaultContent = {
   pages,
   tournaments,
   team,
@@ -753,3 +753,11 @@ module.exports = {
   galleryImages,
   users
 };
+
+if (typeof module !== "undefined" && module.exports) {
+  module.exports = defaultContent;
+}
+
+if (typeof window !== "undefined") {
+  window.RPA_DEFAULTS = defaultContent;
+}
