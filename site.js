@@ -19,6 +19,7 @@ let pageSnapshot = null;
 let dataSnapshot = null;
 let editorBound = false;
 let _districtData = [];
+let _aboutClubsData = [];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -389,11 +390,13 @@ function renderAboutCustomPage(page, data) {
     href: "https://www.ipaofficial.com/"
   };
   const affiliatedClubs = [
-    { city: "Jaipur", name: "RPA Jaipur Club Network", contact: "connect@rajasthanpickleball.com" },
-    { city: "Udaipur", name: "Lake City Pickleball Academy", contact: "connect@rajasthanpickleball.com" },
-    { city: "Jodhpur", name: "Marwar Pickleball Circle", contact: "connect@rajasthanpickleball.com" },
-    { city: "Kota", name: "Kota Training & Youth Hub", contact: "connect@rajasthanpickleball.com" }
+    { city: "Jaipur", name: "RPA Jaipur Club Network", contact: "connect@rajasthanpickleball.com", type: "Club", lat: 26.9124, lng: 75.7873 },
+    { city: "Udaipur", name: "Lake City Pickleball Academy", contact: "connect@rajasthanpickleball.com", type: "Academy", lat: 24.5854, lng: 73.7125 },
+    { city: "Jodhpur", name: "Marwar Pickleball Circle", contact: "connect@rajasthanpickleball.com", type: "Club", lat: 26.2389, lng: 73.0243 },
+    { city: "Kota", name: "Kota Training & Youth Hub", contact: "connect@rajasthanpickleball.com", type: "Academy", lat: 25.2138, lng: 75.8648 }
   ];
+  _aboutClubsData = affiliatedClubs;
+  const clubPinSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.27 7 13 7 13s7-7.73 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" fill="currentColor"/></svg>';
   const governanceItems = [
     { title: "Constitution", body: "Core governance document, association objectives, membership rules, and operating principles." },
     { title: "Board Members", body: "Office bearers and board representatives responsible for state-level direction and oversight." },
@@ -480,22 +483,25 @@ function renderAboutCustomPage(page, data) {
         <div class="about-rpa-section-head">
           <h2>Affiliated Clubs & Academies</h2>
         </div>
-        <div class="about-rpa-clubs-layout">
-          <div class="about-rpa-map-card">
-            <img src="assets/Districts Main Image.png" alt="Rajasthan district map and affiliated clubs" />
-          </div>
-          <div class="about-rpa-club-list">
-            ${affiliatedClubs
-              .map(
-                (club) => `
-                  <article class="about-rpa-club-card">
-                    <span>${escapeHtml(club.city)}</span>
-                    <h3>${escapeHtml(club.name)}</h3>
-                    <a href="mailto:${escapeHtml(club.contact)}">${escapeHtml(club.contact)}</a>
-                  </article>
-                `
-              )
-              .join("")}
+        <div class="about-rpa-clubs-layout rpa-clubs-layout">
+          <div id="about-clubs-map" class="rpa-clubs-map-el" aria-label="Map of affiliated clubs in Rajasthan"></div>
+          <div class="rpa-clubs-sidebar">
+            <div class="rpa-clubs-list">
+              ${affiliatedClubs
+                .map(
+                  (club, index) => `
+                    <button type="button" class="rpa-clubs-list-item" data-idx="${index}">
+                      <span class="rpa-clubs-list-pin" aria-hidden="true">${clubPinSvg}</span>
+                      <span class="rpa-clubs-list-info">
+                        <strong>${escapeHtml(club.name)}</strong>
+                        <span>${escapeHtml(club.city)} • ${escapeHtml(club.contact)}</span>
+                      </span>
+                      <span class="rpa-clubs-list-type rpa-clubs-list-type--${club.type.toLowerCase()}">${escapeHtml(club.type)}</span>
+                    </button>
+                  `
+                )
+                .join("")}
+            </div>
           </div>
         </div>
       </section>
@@ -2350,10 +2356,54 @@ function setupVisualParallax(selector, xVar, yVar) {
   });
 }
 
+function setupAboutClubsMap() {
+  if (!window.L || !_aboutClubsData.length) return;
+  const mapEl = document.getElementById("about-clubs-map");
+  if (!mapEl || mapEl._leaflet_id) return;
+
+  const map = L.map("about-clubs-map", { center: [26.5, 74.5], zoom: 6, scrollWheelZoom: false });
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors © <a href='https://carto.com/attributions'>CARTO</a>",
+    subdomains: "abcd",
+    maxZoom: 20
+  }).addTo(map);
+
+  const markerHtml = '<div class="rpa-map-marker-inner"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.27 7 13 7 13s7-7.73 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" fill="currentColor"/></svg></div>';
+  const icon = L.divIcon({ className: "rpa-map-marker", html: markerHtml, iconSize: [32, 40], iconAnchor: [16, 40], popupAnchor: [0, -44] });
+
+  const markers = _aboutClubsData.map((club, index) => {
+    const marker = L.marker([club.lat, club.lng], { icon }).addTo(map);
+    marker.bindPopup(
+      '<strong style="font-family:\'Plus Jakarta Sans\',sans-serif;color:#0a3d4a;font-size:0.92rem">' + escapeHtml(club.name) + '</strong><br>' +
+      '<span style="color:#66777d;font-size:0.8rem">' + escapeHtml(club.city) + ', Rajasthan</span>',
+      { className: "rpa-map-popup", maxWidth: 200 }
+    );
+    marker.on("click", () => {
+      document.querySelectorAll(".rpa-clubs-list-item").forEach((el) => el.classList.remove("is-active"));
+      const item = document.querySelector('.rpa-clubs-list-item[data-idx="' + index + '"]');
+      if (item) { item.classList.add("is-active"); item.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    });
+    return marker;
+  });
+
+  document.querySelectorAll(".rpa-clubs-list-item").forEach((el) => {
+    el.addEventListener("click", () => {
+      const idx = parseInt(el.dataset.idx, 10);
+      const club = _aboutClubsData[idx];
+      if (!club) return;
+      map.flyTo([club.lat, club.lng], 10, { duration: 1 });
+      markers[idx]?.openPopup();
+      document.querySelectorAll(".rpa-clubs-list-item").forEach((li) => li.classList.remove("is-active"));
+      el.classList.add("is-active");
+    });
+  });
+}
+
 function setupDynamicPage() {
   if (pageName === "about") {
     setupVisualParallax(".about-rpa-visual", "--about-x", "--about-y");
     setupTiltCards([".about-rpa-info", ".about-rpa-do-card", ".about-rpa-person-card", ".about-rpa-milestone"]);
+    setupAboutClubsMap();
     return;
   }
 
