@@ -5257,7 +5257,7 @@ body[data-page="contact"] {
 .media-rpa-copy h1,
 .contact-rpa-copy h1 {
   margin: 0.95rem 0 1rem;
-  font-size: clamp(3rem, 5.4vw, 4.6rem);
+  font-size: clamp(3rem, 5.8vw, 5rem);
   line-height: 0.96;
   color: #055d73;
 }
@@ -5265,11 +5265,13 @@ body[data-page="contact"] {
 .membership-rpa-copy h1 span,
 .membership-rpa-copy h1 em,
 .media-rpa-copy h1 span,
+.media-rpa-copy h1 em,
 .contact-rpa-copy h1 span {
   display: block;
 }
 
-.membership-rpa-copy h1 em {
+.membership-rpa-copy h1 em,
+.media-rpa-copy h1 em {
   font-family: "Caveat", cursive;
   font-style: normal;
   color: #ef8c22;
@@ -6526,16 +6528,19 @@ body[data-page="contact"] {
 
 /* ── Hero tagline ─────────────────────────────── */
 .rpa-hero-tagline {
-  display: inline-block;
-  margin: 0 0 0.6rem;
-  padding: 0.38rem 0.88rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(211, 138, 45, 0.14), rgba(17, 109, 123, 0.1));
-  border: 1px solid rgba(211, 138, 45, 0.22);
-  color: #7a4810;
-  font-size: 0.86rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
+  display: block;
+  margin: 0 0 1rem;
+  padding: 0.65rem 1rem;
+  border-radius: 14px;
+  background: rgba(211, 138, 45, 0.08);
+  border-left: 3px solid var(--gold);
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-style: italic;
+  max-width: 44ch;
+  line-height: 1.5;
+  letter-spacing: 0em;
 }
 
 /* ── Rajasthan motif floating badges ──────────── */
@@ -6957,4 +6962,216 @@ body[data-page="contact"] {
 .districts-all-card-status--emerging {
   background: rgba(211, 138, 45, 0.14);
   color: #8a4e0a;
+}
+
+/* ── Affiliated Clubs & Academies map ─────────── */
+.rpa-clubs-section {
+  margin: 0 0 2.5rem;
+}
+
+.rpa-clubs-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) 320px;
+  gap: 1rem;
+  height: 500px;
+}
+
+.rpa-clubs-map-el {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 109, 123, 0.12);
+  box-shadow: var(--shadow-sm);
+  z-index: 0;
+  position: relative;
+}
+
+.rpa-clubs-sidebar {
+  border-radius: 20px;
+  border: 1px solid rgba(17, 33, 39, 0.08);
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.rpa-clubs-list {
+  overflow-y: auto;
+  flex: 1;
+  padding: 0.5rem;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(17, 109, 123, 0.2) transparent;
+}
+
+.rpa-clubs-list-item {
+  width: 100%;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.7rem 0.8rem;
+  border-radius: 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.18s ease;
+}
+
+.rpa-clubs-list-item:hover {
+  background: rgba(17, 109, 123, 0.06);
+}
+
+.rpa-clubs-list-item.is-active {
+  background: rgba(17, 109, 123, 0.1);
+  box-shadow: inset 0 0 0 1px rgba(17, 109, 123, 0.18);
+}
+
+.rpa-clubs-list-pin {
+  width: 36px;
+  height: 36px;
+  display: grid;
+  place-items: center;
+  border-radius: 10px;
+  background: rgba(17, 109, 123, 0.1);
+  flex-shrink: 0;
+}
+
+.rpa-clubs-list-pin svg {
+  width: 18px;
+  height: 18px;
+  fill: var(--teal);
+}
+
+.rpa-clubs-list-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.rpa-clubs-list-info strong {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: #0a3d4a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.rpa-clubs-list-info span {
+  font-size: 0.76rem;
+  color: var(--ink-soft);
+}
+
+.rpa-clubs-list-type {
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  flex-shrink: 0;
+}
+
+.rpa-clubs-list-type--club {
+  background: rgba(17, 109, 123, 0.12);
+  color: #0d5562;
+}
+
+.rpa-clubs-list-type--academy {
+  background: rgba(211, 138, 45, 0.14);
+  color: #8a4e0a;
+}
+
+/* Leaflet custom marker */
+.rpa-map-marker {
+  background: none !important;
+  border: none !important;
+}
+
+.rpa-map-marker-inner {
+  width: 32px;
+  height: 40px;
+  color: var(--teal, #116d7b);
+  filter: drop-shadow(0 4px 8px rgba(17, 109, 123, 0.4));
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.rpa-map-marker-inner:hover {
+  transform: scale(1.18) translateY(-2px);
+  filter: drop-shadow(0 6px 12px rgba(17, 109, 123, 0.55));
+}
+
+.rpa-map-marker-inner svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Leaflet popup */
+.rpa-map-popup .leaflet-popup-content-wrapper {
+  border-radius: 14px !important;
+  box-shadow: 0 12px 28px rgba(17, 33, 39, 0.16) !important;
+  border: 1px solid rgba(17, 33, 39, 0.08);
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  padding: 0 !important;
+}
+
+.rpa-map-popup .leaflet-popup-content {
+  margin: 0.65rem 0.9rem !important;
+}
+
+.rpa-map-popup .leaflet-popup-tip-container {
+  display: none;
+}
+
+/* Leaflet zoom control */
+.leaflet-control-zoom {
+  border: 1px solid rgba(17, 33, 39, 0.1) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 8px 20px rgba(17, 33, 39, 0.1) !important;
+  overflow: hidden;
+}
+
+.leaflet-control-zoom a {
+  border-radius: 0 !important;
+  color: var(--teal) !important;
+  background: rgba(255, 253, 250, 0.96) !important;
+  font-size: 1.1rem !important;
+  line-height: 30px !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #fff !important;
+}
+
+.leaflet-control-zoom-in {
+  border-bottom: 1px solid rgba(17, 33, 39, 0.08) !important;
+}
+
+.leaflet-attribution-flag { display: none !important; }
+
+.leaflet-control-attribution {
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 0.68rem !important;
+  background: rgba(255, 253, 250, 0.82) !important;
+  backdrop-filter: blur(6px);
+  border-radius: 8px 0 0 0 !important;
+  padding: 3px 8px !important;
+}
+
+@media (max-width: 900px) {
+  .rpa-clubs-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .rpa-clubs-map-el {
+    height: 360px;
+  }
+
+  .rpa-clubs-sidebar {
+    height: 280px;
+  }
 }

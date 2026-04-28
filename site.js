@@ -856,7 +856,8 @@ function renderAnnualCalendarPage(page, data) {
           <span class="rpa-pill">Annual RPA Events</span>
           <h1>
             Annual
-            <span>Calendar</span>
+            <span>RPA</span>
+            <em>Calendar.</em>
           </h1>
           <p>Follow the broad RPA event rhythm for tournaments, district activity, trials, clubs, academies and development programs across Rajasthan.</p>
           <div class="media-rpa-actions">
@@ -1592,6 +1593,7 @@ function renderMediaCustomPage(page, data) {
           <h1>
             Image
             <span>Gallery</span>
+            <em>Highlights.</em>
           </h1>
           <p>${escapeHtml(
             hero.description || "Browse highlights from tournaments, district clinics, and community sessions across Rajasthan."
@@ -1659,6 +1661,7 @@ function renderGalleryEventsPage(page, data) {
           <h1>
             RPA
             <span>Media</span>
+            <em>Centre.</em>
           </h1>
           <p>${escapeHtml(
             hero.description || "Placeholder media hub for event galleries, press coverage, articles, and official RPA updates."

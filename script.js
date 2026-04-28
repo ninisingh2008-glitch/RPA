@@ -6,6 +6,7 @@ const navToggle = document.getElementById("navToggle");
 const navLinks = document.getElementById("landingNavLinks");
 const authActions = document.getElementById("landingAuth");
 const footerBlurb = document.getElementById("homeFooterBlurb");
+let _clubsData = [];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -174,6 +175,7 @@ function setupDynamicHome() {
   setupHeroParallax();
   setupScrollParallax();
   setupTiltCards([".rpa-tournament-card", ".rpa-feature-card", ".rpa-gallery-card", ".rpa-testimonial-card"]);
+  setupClubsMap();
 }
 
 function getLocalSession() {
@@ -458,6 +460,80 @@ function renderInstagramHighlights(instagram = {}) {
   `;
 }
 
+function renderClubsMap() {
+  const clubs = [
+    { name: "Jaipur Pickleball Club",       city: "Jaipur",         lat: 26.9124, lng: 75.7873, type: "Club"    },
+    { name: "Pink City Pickleball Academy", city: "Jaipur",         lat: 26.8850, lng: 75.8218, type: "Academy" },
+    { name: "Lakecity Pickle Club",         city: "Udaipur",        lat: 24.5854, lng: 73.7125, type: "Club"    },
+    { name: "Blue City Pickleball",         city: "Jodhpur",        lat: 26.2389, lng: 73.0243, type: "Club"    },
+    { name: "Kota Pickleball Academy",      city: "Kota",           lat: 25.2138, lng: 75.8648, type: "Academy" },
+    { name: "Ajmer Pickle Club",            city: "Ajmer",          lat: 26.4499, lng: 74.6399, type: "Club"    },
+    { name: "Desert Smash Academy",         city: "Bikaner",        lat: 28.0229, lng: 73.3119, type: "Academy" },
+    { name: "Alwar Pickle Academy",         city: "Alwar",          lat: 27.5530, lng: 76.6346, type: "Academy" },
+    { name: "Shekhawati Pickle Club",       city: "Sikar",          lat: 27.6094, lng: 75.1399, type: "Club"    },
+    { name: "Ganganagar Pickleball Club",   city: "Sri Ganganagar", lat: 29.9167, lng: 73.8750, type: "Club"    }
+  ];
+  _clubsData = clubs;
+  const pinSvg = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5.27 7 13 7 13s7-7.73 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" fill="currentColor"/></svg>';
+  const listItems = clubs
+    .map(
+      (club, i) =>
+        '<button type="button" class="rpa-clubs-list-item" data-idx="' + i + '">'
+        + '<span class="rpa-clubs-list-pin" aria-hidden="true">' + pinSvg + '</span>'
+        + '<span class="rpa-clubs-list-info"><strong>' + escapeHtml(club.name) + '</strong>'
+        + '<span>' + escapeHtml(club.city) + ', Rajasthan</span></span>'
+        + '<span class="rpa-clubs-list-type rpa-clubs-list-type--' + club.type.toLowerCase() + '">' + escapeHtml(club.type) + '</span>'
+        + '</button>'
+    )
+    .join("");
+  return '<section class="rpa-clubs-section">'
+    + '<div class="rpa-section-head"><span></span><h2>Affiliated Clubs &amp; Academies</h2>'
+    + '<a href="membership.html">Affiliate your club</a></div>'
+    + '<div class="rpa-clubs-layout">'
+    + '<div id="rpa-clubs-map" class="rpa-clubs-map-el" aria-label="Map of affiliated clubs in Rajasthan"></div>'
+    + '<div class="rpa-clubs-sidebar"><div class="rpa-clubs-list">' + listItems + '</div></div>'
+    + '</div></section>';
+}
+
+function setupClubsMap() {
+  if (!window.L || !_clubsData.length) return;
+  const mapEl = document.getElementById("rpa-clubs-map");
+  if (!mapEl || mapEl._leaflet_id) return;
+  const map = L.map("rpa-clubs-map", { center: [26.5, 74.5], zoom: 6, scrollWheelZoom: false });
+  L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
+    attribution: "© <a href='https://www.openstreetmap.org/copyright'>OpenStreetMap</a> contributors © <a href='https://carto.com/attributions'>CARTO</a>",
+    subdomains: "abcd",
+    maxZoom: 20
+  }).addTo(map);
+  const markerHtml = '<div class="rpa-map-marker-inner"><svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.27 7 13 7 13s7-7.73 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z" fill="currentColor"/></svg></div>';
+  const icon = L.divIcon({ className: "rpa-map-marker", html: markerHtml, iconSize: [32, 40], iconAnchor: [16, 40], popupAnchor: [0, -44] });
+  const markers = _clubsData.map((club, i) => {
+    const m = L.marker([club.lat, club.lng], { icon }).addTo(map);
+    m.bindPopup(
+      '<strong style="font-family:\'Plus Jakarta Sans\',sans-serif;color:#0a3d4a;font-size:0.92rem">' + escapeHtml(club.name) + '</strong><br>'
+      + '<span style="color:#66777d;font-size:0.8rem">' + escapeHtml(club.city) + ', Rajasthan</span>',
+      { className: "rpa-map-popup", maxWidth: 200 }
+    );
+    m.on("click", () => {
+      document.querySelectorAll(".rpa-clubs-list-item").forEach((el) => el.classList.remove("is-active"));
+      const item = document.querySelector('.rpa-clubs-list-item[data-idx="' + i + '"]');
+      if (item) { item.classList.add("is-active"); item.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
+    });
+    return m;
+  });
+  document.querySelectorAll(".rpa-clubs-list-item").forEach((el) => {
+    el.addEventListener("click", () => {
+      const idx = parseInt(el.dataset.idx, 10);
+      const club = _clubsData[idx];
+      if (!club) return;
+      map.flyTo([club.lat, club.lng], 10, { duration: 1 });
+      markers[idx]?.openPopup();
+      document.querySelectorAll(".rpa-clubs-list-item").forEach((li) => li.classList.remove("is-active"));
+      el.classList.add("is-active");
+    });
+  });
+}
+
 function renderHome(data) {
   const page = data.page || {};
   const hero = page.hero || {};
@@ -556,6 +632,8 @@ function renderHome(data) {
             <div class="rpa-city-list">${renderCities()}</div>
           </div>
         </section>
+
+        ${renderClubsMap()}
 
         <section class="rpa-section-grid rpa-section-grid--bottom">
           <div class="rpa-block">
