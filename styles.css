@@ -737,7 +737,7 @@ p {
 
 .landing-nav-links {
   display: flex;
-  gap: 1.4rem;
+  gap: clamp(0.75rem, 1.15vw, 1.4rem);
   margin-left: auto;
 }
 
@@ -745,7 +745,7 @@ p {
   position: relative;
   padding: 0.3rem 0;
   color: var(--ink);
-  font-size: 0.95rem;
+  font-size: clamp(0.82rem, 0.85vw, 0.95rem);
   font-weight: 600;
 }
 
@@ -1676,6 +1676,118 @@ p {
   border: 1px solid rgba(255, 255, 255, 0.7);
 }
 
+.auth-visual-panel {
+  position: relative;
+  min-height: 420px;
+  overflow: hidden;
+  border-radius: 28px;
+  background: #123f49;
+}
+
+.auth-visual-panel img {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  display: block;
+  opacity: 0.88;
+}
+
+.auth-visual-panel::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(13, 44, 52, 0.08), rgba(13, 44, 52, 0.84));
+}
+
+.auth-visual-copy {
+  position: absolute;
+  left: 1.25rem;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 1;
+}
+
+.auth-visual-copy h1,
+.auth-visual-copy p {
+  color: #fff;
+}
+
+.auth-visual-copy h1 {
+  max-width: 30rem;
+  margin: 0.8rem 0 0.7rem;
+  font-size: clamp(2.45rem, 4.2vw, 4rem);
+  line-height: 0.98;
+}
+
+.auth-visual-copy p {
+  max-width: 31rem;
+  margin: 0;
+}
+
+.auth-member-types,
+.auth-faq-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.85rem;
+  margin-top: 0.95rem;
+}
+
+.auth-member-types article,
+.auth-faq-grid article {
+  padding: 1rem;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.72);
+  border: 1px solid rgba(13, 86, 98, 0.08);
+}
+
+.auth-member-types span {
+  display: inline-block;
+  margin-bottom: 0.45rem;
+  color: #0b6174;
+  font-weight: 900;
+}
+
+.auth-member-types p,
+.auth-faq-grid p {
+  margin: 0;
+  color: #62767e;
+}
+
+.auth-form-card h2 {
+  margin: 0.55rem 0 0.65rem;
+  color: #123f49;
+  font-size: clamp(1.9rem, 3vw, 2.6rem);
+}
+
+.auth-faq-strip {
+  margin-top: 1.1rem;
+  padding: 1.4rem;
+  border-radius: 28px;
+  background: rgba(255, 253, 249, 0.88);
+  border: 1px solid rgba(13, 86, 98, 0.08);
+  box-shadow: 0 16px 34px rgba(24, 42, 48, 0.06);
+}
+
+.auth-faq-head {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.95rem;
+}
+
+.auth-faq-head h2,
+.auth-faq-grid h3 {
+  margin: 0;
+  color: #173a43;
+}
+
+.auth-faq-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 0;
+}
+
 .auth-switch {
   display: inline-flex;
   gap: 0.4rem;
@@ -1978,6 +2090,7 @@ textarea {
   .footer-grid,
   .admin-grid,
   .auth-grid,
+  .auth-faq-grid,
   .story-panel {
     grid-template-columns: 1fr;
   }
@@ -2041,7 +2154,7 @@ textarea {
   }
 
   .landing-auth.is-open {
-    top: calc(100% + 158px);
+    top: calc(100% + 250px);
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
@@ -2100,6 +2213,15 @@ textarea {
   .card-shell,
   .admin-callout {
     padding: 1.2rem;
+  }
+
+  .auth-member-types {
+    grid-template-columns: 1fr;
+  }
+
+  .auth-visual-panel,
+  .auth-visual-panel img {
+    min-height: 320px;
   }
 
   .admin-record-fields {
@@ -4570,6 +4692,8 @@ body[data-page="about"] .landing-auth .btn-primary {
 }
 
 body[data-page="membership"] .landing-nav,
+body[data-page="learn"] .landing-nav,
+body[data-page="shop"] .landing-nav,
 body[data-page="media"] .landing-nav,
 body[data-page="districts"] .landing-nav,
 body[data-page="contact"] .landing-nav,
@@ -4585,6 +4709,8 @@ body[data-page="state-team"] .landing-nav {
 }
 
 body[data-page="membership"] .landing-nav-links,
+body[data-page="learn"] .landing-nav-links,
+body[data-page="shop"] .landing-nav-links,
 body[data-page="media"] .landing-nav-links,
 body[data-page="districts"] .landing-nav-links,
 body[data-page="contact"] .landing-nav-links,
@@ -4593,6 +4719,8 @@ body[data-page="state-team"] .landing-nav-links {
 }
 
 body[data-page="membership"] .landing-nav-links a,
+body[data-page="learn"] .landing-nav-links a,
+body[data-page="shop"] .landing-nav-links a,
 body[data-page="media"] .landing-nav-links a,
 body[data-page="districts"] .landing-nav-links a,
 body[data-page="contact"] .landing-nav-links a,
@@ -4605,6 +4733,8 @@ body[data-page="state-team"] .landing-nav-links a {
 }
 
 body[data-page="membership"] .landing-nav-links a::after,
+body[data-page="learn"] .landing-nav-links a::after,
+body[data-page="shop"] .landing-nav-links a::after,
 body[data-page="media"] .landing-nav-links a::after,
 body[data-page="districts"] .landing-nav-links a::after,
 body[data-page="contact"] .landing-nav-links a::after,
@@ -4624,6 +4754,10 @@ body[data-page="state-team"] .landing-nav-links a::after {
 
 body[data-page="membership"] .landing-nav-links a:hover::after,
 body[data-page="membership"] .landing-nav-links a.is-active::after,
+body[data-page="learn"] .landing-nav-links a:hover::after,
+body[data-page="learn"] .landing-nav-links a.is-active::after,
+body[data-page="shop"] .landing-nav-links a:hover::after,
+body[data-page="shop"] .landing-nav-links a.is-active::after,
 body[data-page="media"] .landing-nav-links a:hover::after,
 body[data-page="media"] .landing-nav-links a.is-active::after,
 body[data-page="districts"] .landing-nav-links a:hover::after,
@@ -4636,6 +4770,8 @@ body[data-page="state-team"] .landing-nav-links a.is-active::after {
 }
 
 body[data-page="membership"] .landing-auth .btn-primary,
+body[data-page="learn"] .landing-auth .btn-primary,
+body[data-page="shop"] .landing-auth .btn-primary,
 body[data-page="media"] .landing-auth .btn-primary,
 body[data-page="districts"] .landing-auth .btn-primary,
 body[data-page="contact"] .landing-auth .btn-primary,
@@ -5078,6 +5214,8 @@ body[data-page="districts"] {
 }
 
 body[data-page="membership"],
+body[data-page="learn"],
+body[data-page="shop"],
 body[data-page="media"],
 body[data-page="contact"] {
   background:
@@ -5656,6 +5794,304 @@ body[data-page="contact"] {
   font-weight: 700;
 }
 
+.learn-rpa,
+.shop-rpa {
+  padding-bottom: 3rem;
+}
+
+.learn-rpa-hero,
+.shop-rpa-hero,
+.learn-rpa-section,
+.shop-rpa-section,
+.learn-rpa-columns {
+  margin: 0 clamp(28px, 4vw, 56px);
+}
+
+.learn-rpa-hero,
+.shop-rpa-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: 1.5rem;
+  align-items: center;
+  padding: 1.6rem 0 1.35rem;
+}
+
+.learn-rpa-copy h1,
+.shop-rpa-copy h1 {
+  margin: 0.95rem 0 1rem;
+  color: #055d73;
+  font-size: clamp(3rem, 5.4vw, 4.7rem);
+  line-height: 0.96;
+}
+
+.learn-rpa-copy h1 span,
+.shop-rpa-copy h1 span {
+  display: block;
+}
+
+.learn-rpa-copy p,
+.shop-rpa-copy p {
+  max-width: 36rem;
+  margin: 0 0 1.3rem;
+  color: #5b7078;
+  font-size: 1.04rem;
+}
+
+.learn-rpa-actions,
+.shop-rpa-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+}
+
+.learn-rpa-visual,
+.shop-rpa-visual {
+  position: relative;
+  min-height: 420px;
+  border-radius: 28px;
+  overflow: hidden;
+  background: #fff8ec;
+}
+
+.learn-rpa-image,
+.shop-rpa-image {
+  width: 100%;
+  height: 100%;
+  min-height: 420px;
+  object-fit: cover;
+  display: block;
+  transform: translate(var(--learn-x, var(--shop-x, 0)), var(--learn-y, var(--shop-y, 0))) scale(1.02);
+  transition: transform 0.28s ease;
+}
+
+.learn-video-chip {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 0.75rem 0.9rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.88);
+  color: #123f49;
+  font-weight: 800;
+  box-shadow: 0 14px 30px rgba(20, 42, 48, 0.14);
+}
+
+.learn-video-chip span {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  background: #ef8c22;
+}
+
+.learn-rpa-section,
+.shop-rpa-section,
+.learn-rpa-columns {
+  margin-bottom: 1.2rem;
+}
+
+.learn-intro-grid,
+.learn-tutorial-grid,
+.shop-product-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.learn-intro-grid {
+  grid-template-columns: minmax(0, 1.35fr) repeat(2, minmax(0, 0.82fr));
+}
+
+.learn-tutorial-grid,
+.shop-product-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.learn-intro-card,
+.learn-tutorial-card,
+.learn-coach-card,
+.learn-rulebook-card,
+.shop-product-card,
+.shop-payment-panel {
+  border: 1px solid rgba(13, 86, 98, 0.08);
+  border-radius: 22px;
+  background: rgba(255, 253, 249, 0.98);
+  box-shadow: 0 16px 34px rgba(24, 42, 48, 0.06);
+  transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.learn-intro-card,
+.learn-tutorial-card,
+.learn-rulebook-card {
+  padding: 1.1rem;
+}
+
+.learn-intro-card--wide {
+  display: grid;
+  grid-template-columns: minmax(190px, 0.85fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+}
+
+.learn-intro-card img,
+.shop-product-card img {
+  width: 100%;
+  border-radius: 18px;
+  object-fit: cover;
+}
+
+.learn-intro-card img {
+  min-height: 220px;
+  aspect-ratio: 1.1 / 1;
+}
+
+.learn-intro-card h3,
+.learn-tutorial-card h3,
+.learn-coach-card h3,
+.learn-rulebook-card h3,
+.shop-product-card h3,
+.shop-payment-panel h2 {
+  margin: 0 0 0.45rem;
+  color: #173a43;
+}
+
+.learn-intro-card p,
+.learn-tutorial-card p,
+.learn-coach-card p,
+.learn-rulebook-card p,
+.shop-product-card p,
+.shop-payment-panel p {
+  margin: 0;
+  color: #657b83;
+}
+
+.learn-video-box {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  min-height: 150px;
+  margin-bottom: 0.9rem;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(17, 109, 123, 0.1), rgba(239, 140, 34, 0.16));
+  color: #0b6174;
+}
+
+.learn-video-box svg {
+  width: 42px;
+  height: 42px;
+  fill: currentColor;
+}
+
+.learn-tutorial-card span,
+.shop-product-copy span {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  color: #b86612;
+  font-weight: 900;
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.learn-tutorial-card a,
+.learn-coach-card a {
+  display: inline-block;
+  margin-top: 0.85rem;
+  color: #0b6174;
+  font-weight: 800;
+}
+
+.learn-rpa-columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 1.2rem;
+}
+
+.learn-coach-list {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.learn-coach-card {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.95rem;
+}
+
+.learn-coach-avatar {
+  display: grid;
+  place-items: center;
+  flex: 0 0 56px;
+  width: 56px;
+  height: 56px;
+  border-radius: 18px;
+  background: #eaf4f6;
+  color: #0b6174;
+  font-weight: 900;
+}
+
+.learn-rulebook-card {
+  min-height: calc(100% - 3.7rem);
+  display: grid;
+  align-content: center;
+  gap: 0.75rem;
+}
+
+.shop-product-card {
+  overflow: hidden;
+}
+
+.shop-product-card img {
+  aspect-ratio: 1.2 / 1;
+  padding: 1.4rem;
+  background: linear-gradient(135deg, rgba(17, 109, 123, 0.09), rgba(239, 140, 34, 0.14));
+}
+
+.shop-product-copy {
+  display: grid;
+  gap: 0.55rem;
+  padding: 1rem;
+}
+
+.shop-payment-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.9fr);
+  gap: 1.2rem;
+  align-items: center;
+  padding: clamp(1.1rem, 2vw, 1.6rem);
+  background:
+    linear-gradient(135deg, rgba(14, 106, 121, 0.08), rgba(240, 163, 57, 0.1)),
+    rgba(255, 253, 249, 0.98);
+}
+
+.shop-payment-steps {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.shop-payment-steps article {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.85rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.74);
+}
+
+.shop-payment-steps strong {
+  display: grid;
+  place-items: center;
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #0b6174;
+  color: #fff;
+}
+
 .annual-calendar-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5949,6 +6385,7 @@ body[data-page="contact"] {
   .about-rpa-governance-grid,
   .about-rpa-president,
   .districts-rpa-stats,
+  .districts-feature-grid,
   .membership-benefits-grid,
   .membership-register-grid,
   .media-gallery-grid,
@@ -5963,11 +6400,16 @@ body[data-page="contact"] {
   }
 
   .membership-rpa-hero,
+  .learn-rpa-hero,
+  .shop-rpa-hero,
   .media-rpa-hero,
   .contact-rpa-hero,
   .districts-rpa-hero,
   .districts-rpa-grid,
   .membership-rpa-columns,
+  .learn-rpa-columns,
+  .learn-intro-grid,
+  .shop-payment-panel,
   .membership-affiliation-panel,
   .media-feature-panel,
   .contact-rpa-grid {
@@ -5975,7 +6417,9 @@ body[data-page="contact"] {
   }
 
   .membership-process-grid,
-  .membership-plan-grid {
+  .membership-plan-grid,
+  .learn-tutorial-grid,
+  .shop-product-grid {
     grid-template-columns: 1fr;
   }
 }
@@ -5996,6 +6440,8 @@ body[data-page="contact"] {
   .about-rpa-president,
   .districts-rpa-stats,
   .districts-rpa-cards,
+  .districts-feature-grid,
+  .districts-all-grid,
   .membership-benefits-grid,
   .membership-register-grid,
   .media-gallery-grid,
@@ -6019,6 +6465,11 @@ body[data-page="contact"] {
   .membership-rpa-hero,
   .membership-rpa-section,
   .membership-rpa-columns,
+  .learn-rpa-hero,
+  .learn-rpa-section,
+  .learn-rpa-columns,
+  .shop-rpa-hero,
+  .shop-rpa-section,
   .media-rpa-hero,
   .media-rpa-section,
   .contact-rpa-hero,
@@ -6042,10 +6493,34 @@ body[data-page="contact"] {
     min-height: 280px;
   }
 
+  .districts-all-card {
+    grid-template-columns: 46px minmax(0, 1fr);
+  }
+
+  .districts-all-card .districts-all-card-status {
+    justify-self: start;
+    grid-column: 2;
+  }
+
+  .districts-directory-head {
+    display: grid;
+  }
+
   .membership-rpa-visual,
+  .learn-rpa-visual,
+  .shop-rpa-visual,
   .media-rpa-visual,
   .contact-rpa-visual {
     min-height: 280px;
+  }
+
+  .learn-rpa-image,
+  .shop-rpa-image {
+    min-height: 280px;
+  }
+
+  .learn-intro-card--wide {
+    grid-template-columns: 1fr;
   }
 }
 
@@ -6302,9 +6777,100 @@ body[data-page="contact"] {
 /* ── All-districts full grid ──────────────────── */
 .districts-all-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.65rem;
+  margin-top: 0.85rem;
+}
+
+.districts-rpa-subcopy {
+  max-width: 54rem;
+  margin: 0 0 1rem;
+  color: #66777d;
+  font-size: 0.95rem;
+}
+
+.districts-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 1rem;
-  margin-top: 1.2rem;
+  margin-bottom: 1.1rem;
+}
+
+.districts-feature-card {
+  position: relative;
+  min-height: 250px;
+  overflow: hidden;
+  border: 0;
+  border-radius: 20px;
+  padding: 0;
+  background: #123f49;
+  color: #fff;
+  text-align: left;
+  cursor: pointer;
+  box-shadow: 0 16px 34px rgba(24, 42, 48, 0.12);
+}
+
+.districts-feature-card img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.82;
+  transition: transform 0.22s ease;
+}
+
+.districts-feature-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(10, 35, 42, 0.02), rgba(10, 35, 42, 0.82));
+}
+
+.districts-feature-card:hover img {
+  transform: scale(1.04);
+}
+
+.districts-feature-card > div {
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1;
+}
+
+.districts-feature-card h3,
+.districts-feature-card p {
+  margin: 0;
+  color: inherit;
+}
+
+.districts-feature-card h3 {
+  margin-bottom: 0.25rem;
+  font-size: 1.35rem;
+}
+
+.districts-directory-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: end;
+  gap: 1rem;
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(13, 86, 98, 0.08);
+}
+
+.districts-directory-head h3,
+.districts-directory-head span {
+  margin: 0;
+}
+
+.districts-directory-head h3 {
+  color: #173a43;
+}
+
+.districts-directory-head span {
+  color: #6a7d84;
+  font-size: 0.86rem;
 }
 
 .districts-all-card {
@@ -6316,6 +6882,31 @@ body[data-page="contact"] {
   box-shadow: 0 10px 20px rgba(40, 48, 55, 0.06);
   cursor: pointer;
   transition: transform 0.22s ease, box-shadow 0.22s ease;
+}
+
+.districts-all-card {
+  display: grid;
+  grid-template-columns: 52px minmax(0, 1fr) auto;
+  align-items: center;
+  min-height: 78px;
+  padding: 0.65rem 0.75rem;
+  text-align: left;
+}
+
+.districts-all-card-img {
+  width: 44px;
+  height: 44px;
+  aspect-ratio: 1;
+  border-radius: 14px;
+}
+
+.districts-all-card-copy {
+  padding: 0;
+}
+
+.districts-all-card .districts-all-card-status {
+  position: static;
+  justify-self: end;
 }
 
 .districts-all-card:hover {

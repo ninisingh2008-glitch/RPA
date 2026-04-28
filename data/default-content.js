@@ -326,6 +326,40 @@ const pages = {
     footerBlurb:
       "Official home for membership, tournaments, district growth, and public communication across Rajasthan."
   },
+  learn: {
+    title: "Learn Pickleball",
+    hero: {
+      eyebrow: "Learn Pickleball",
+      title: "Learn the game, then play it well.",
+      description:
+        "A beginner-friendly learning hub for rules, tutorials, coaching contacts and official resources.",
+      actions: [
+        { label: "Watch Tutorials", href: "#tutorials" },
+        { label: "Open Rulebook", href: "#rulebook", secondary: true }
+      ],
+      tags: ["Basics", "Video tutorials", "Coaches", "Rulebook", "FAQs"]
+    },
+    sections: [],
+    footerBlurb:
+      "Official learning resources, coaching contacts and rulebook links for pickleball across Rajasthan."
+  },
+  shop: {
+    title: "Shop",
+    hero: {
+      eyebrow: "RPA Shop",
+      title: "Official RPA Merchandise",
+      description:
+        "A placeholder storefront for official jerseys, jumpers, caps and future merchandise drops.",
+      actions: [
+        { label: "Browse Merchandise", href: "#shop-products" },
+        { label: "Payment Details", href: "#payment", secondary: true }
+      ],
+      tags: ["Jersey", "Jumper", "Cap", "Payment gateway"]
+    },
+    sections: [],
+    footerBlurb:
+      "Official merchandise placeholders and payment flow information for Rajasthan Pickleball Association."
+  },
   districts: {
     title: "Districts",
     hero: {

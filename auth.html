@@ -24,8 +24,10 @@
           <a href="index.html">Home</a>
           <a href="about.html">About</a>
           <a href="tournaments.html">Tournaments</a>
+          <a href="learn.html">Learn</a>
           <a href="membership.html">Membership</a>
           <a href="districts.html">Districts</a>
+          <a href="shop.html">Shop</a>
           <a href="gallery.html">Media</a>
           <a href="contact.html">Contact</a>
         </nav>
@@ -38,26 +40,34 @@
     <main class="shell auth-shell">
       <div class="auth-grid">
         <section class="auth-card">
-          <span class="eyebrow">Accounts</span>
-          <h1>Login or create an account.</h1>
-          <p>
-            Use one clean account flow for sign-in, updates, and member access as the platform grows.
-          </p>
-          <div class="card-grid">
-            <article class="content-card">
-              <span class="card-meta">Updates</span>
-              <h3>Create an account</h3>
-              <p>Set up an account to stay connected with tournaments, announcements, and future member features.</p>
+          <div class="auth-visual-panel">
+            <img src="assets/Membership Main Image.png" alt="RPA member access visual" />
+            <div class="auth-visual-copy">
+              <span class="eyebrow">Member Access</span>
+              <h1>Login or create an account.</h1>
+              <p>
+                Choose the membership route that fits your role in the Rajasthan pickleball ecosystem.
+              </p>
+            </div>
+          </div>
+          <div class="auth-member-types">
+            <article>
+              <span>Player</span>
+              <p>For individual players, parents and athletes joining tournaments, camps and updates.</p>
             </article>
-            <article class="content-card">
-              <span class="card-meta">Access</span>
-              <h3>One shared sign-in flow</h3>
-              <p>Keep login and signup simple so non-technical users can access the platform without friction.</p>
+            <article>
+              <span>Club / Academy</span>
+              <p>For institutions, venues, clubs and academies seeking official coordination.</p>
             </article>
           </div>
         </section>
 
-        <section class="auth-card">
+        <section class="auth-card auth-form-card">
+          <span class="eyebrow">Accounts</span>
+          <h2>Access your RPA account</h2>
+          <p>
+            Login, register as a player, or register as a club/academy using the same clean account flow.
+          </p>
           <div class="auth-switch" role="tablist" aria-label="Account forms">
             <button id="loginTab" class="is-active" type="button">Login</button>
             <button id="signupTab" type="button">Sign Up</button>
@@ -90,6 +100,13 @@
               <input type="email" name="email" autocomplete="email" required />
             </label>
             <label>
+              Membership type
+              <select name="membershipType" required>
+                <option value="Player">Register as Player</option>
+                <option value="Club / Academy">Register as Club / Academy</option>
+              </select>
+            </label>
+            <label>
               Password
               <input type="password" name="password" autocomplete="new-password" required />
             </label>
@@ -108,6 +125,27 @@
           </section>
         </section>
       </div>
+
+      <section class="auth-faq-strip">
+        <div class="auth-faq-head">
+          <span class="eyebrow">FAQs</span>
+          <h2>Membership questions</h2>
+        </div>
+        <div class="auth-faq-grid">
+          <article>
+            <h3>Which type should I choose?</h3>
+            <p>Players should use individual registration. Clubs, venues and academies should use Club / Academy.</p>
+          </article>
+          <article>
+            <h3>Can details be edited later?</h3>
+            <p>Placeholder answer for profile edits, document updates and membership verification.</p>
+          </article>
+          <article>
+            <h3>What happens after signup?</h3>
+            <p>Placeholder answer for approval, payment, account activation and official follow-up.</p>
+          </article>
+        </div>
+      </section>
     </main>
 
     <script src="auth.js"></script>

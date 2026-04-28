@@ -1045,6 +1045,30 @@ function renderDistrictsCustomPage(page) {
     )
     .join("");
 
+  const featuredDistricts = allDistricts.filter((district) =>
+    ["jaipur", "udaipur", "jodhpur", "kota", "ajmer", "bikaner"].includes(district.id)
+  );
+
+  const featuredCards = featuredDistricts
+    .map(
+      (district) => `
+        <button
+          type="button"
+          class="districts-feature-card"
+          data-district-id="${escapeHtml(district.id)}"
+          aria-label="View ${escapeHtml(district.name)} district details"
+        >
+          <img src="${escapeHtml(district.image)}" alt="${escapeHtml(district.name)} district visual" loading="lazy" />
+          <span class="districts-all-card-status districts-all-card-status--${escapeHtml(district.status)}">${district.status === "active" ? "Active" : "Emerging"}</span>
+          <div>
+            <h3>${escapeHtml(district.name)}</h3>
+            <p>${escapeHtml(district.feature)}</p>
+          </div>
+        </button>
+      `
+    )
+    .join("");
+
   const districtCards = allDistricts
     .map(
       (district) => `
@@ -1112,9 +1136,16 @@ function renderDistrictsCustomPage(page) {
       <section class="districts-rpa-grid reveal" id="district-network">
         <div class="districts-rpa-main">
           <div class="about-rpa-section-head">
-            <h2>All 33 District Bodies</h2>
+            <h2>Featured District Hubs</h2>
           </div>
-          <p style="margin:0 0 0.5rem;font-size:0.9rem;color:#66777d;">Click a district to view its identity and contact details.</p>
+          <p class="districts-rpa-subcopy">Start with highlighted hubs, then scan the full directory below. Every district can later hold clubs, academies, venues and official contacts.</p>
+          <div class="districts-feature-grid">
+            ${featuredCards}
+          </div>
+          <div class="districts-directory-head">
+            <h3>All 33 District Bodies</h3>
+            <span>Click any district to view placeholder contact details</span>
+          </div>
           <div class="districts-all-grid">
             ${districtCards}
           </div>
@@ -1300,6 +1331,224 @@ function renderMembershipCustomPage(page) {
         <div class="about-rpa-actions">
           <a href="auth.html#signup" class="btn btn-light">Become a Member</a>
           <a href="contact.html" class="btn btn-outline-light">Contact Us</a>
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderLearnCustomPage(page) {
+  const hero = page.hero || {};
+  const tutorials = [
+    { level: "Beginner", title: "First touch and court basics", body: "Placeholder for beginner video tutorials covering grip, serve, kitchen rules, scoring and safe movement.", href: "contact.html" },
+    { level: "Intermediate", title: "Dinks, drives and doubles patterns", body: "Placeholder for intermediate tutorials on shot selection, resets, positioning and partner communication.", href: "contact.html" },
+    { level: "Pro", title: "Tournament strategy and match prep", body: "Placeholder for advanced tutorials on speedups, poaching, stacking, scouting and pressure management.", href: "contact.html" }
+  ];
+  const coaches = [
+    { name: "Coach Name Placeholder", role: "Official Coach", city: "Jaipur", contact: "connect@rajasthanpickleball.com" },
+    { name: "Coach Name Placeholder", role: "District Coach", city: "Udaipur", contact: "connect@rajasthanpickleball.com" },
+    { name: "Coach Name Placeholder", role: "Academy Coach", city: "Jodhpur", contact: "connect@rajasthanpickleball.com" }
+  ];
+  const faqs = [
+    { question: "Who can learn pickleball?", answer: "Placeholder answer for age groups, beginner friendliness, and how new players can start safely." },
+    { question: "What equipment is needed?", answer: "Placeholder answer for paddle, ball, shoes, court access, and optional coaching support." },
+    { question: "Where can I train?", answer: "Placeholder answer linking players to official coaches, districts, clubs and academies." }
+  ];
+
+  return `
+    <section class="learn-rpa">
+      <section class="learn-rpa-hero reveal">
+        <div class="learn-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Learn Pickleball")}</span>
+          <h1>
+            Learn the game,
+            <span>then play it well.</span>
+          </h1>
+          <p>${escapeHtml(
+            hero.description ||
+              "A beginner-friendly learning hub for rules, tutorials, coaching contacts and official resources."
+          )}</p>
+          <div class="learn-rpa-actions">
+            <a href="#tutorials" class="btn btn-primary">Watch Tutorials</a>
+            <a href="#rulebook" class="btn btn-ghost">Open Rulebook</a>
+          </div>
+        </div>
+        <div class="learn-rpa-visual">
+          <img src="assets/Index Main Image.png" alt="Pickleball learning visual" class="learn-rpa-image" />
+          <div class="learn-video-chip">
+            <span></span>
+            Video / AI Visual Placeholder
+          </div>
+        </div>
+      </section>
+
+      <section class="learn-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>What is pickleball?</h2>
+        </div>
+        <div class="learn-intro-grid">
+          <article class="learn-intro-card learn-intro-card--wide">
+            <img src="assets/Membership Main Image.png" alt="Pickleball basics visual" />
+            <div>
+              <span class="rpa-pill">Photo / Video / AI Visual</span>
+              <h3>Fast to learn, tactical to master.</h3>
+              <p>Placeholder explainer for what pickleball is, how it blends tennis, badminton and table tennis, and why it works for schools, families, clubs and competitive players.</p>
+            </div>
+          </article>
+          <article class="learn-intro-card">
+            <h3>Court & scoring</h3>
+            <p>Placeholder for court dimensions, doubles play, serving order, non-volley zone and basic scoring.</p>
+          </article>
+          <article class="learn-intro-card">
+            <h3>How to start</h3>
+            <p>Placeholder for beginner steps, coach contact, district route and equipment guidance.</p>
+          </article>
+        </div>
+      </section>
+
+      <section class="learn-rpa-section reveal" id="tutorials">
+        <div class="about-rpa-section-head">
+          <h2>Video Tutorials</h2>
+        </div>
+        <div class="learn-tutorial-grid">
+          ${tutorials
+            .map(
+              (item) => `
+                <article class="learn-tutorial-card">
+                  <div class="learn-video-box">${iconMarkup("clinics")}</div>
+                  <span>${escapeHtml(item.level)}</span>
+                  <h3>${escapeHtml(item.title)}</h3>
+                  <p>${escapeHtml(item.body)}</p>
+                  <a href="${escapeHtml(item.href)}">Add video link</a>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="learn-rpa-columns reveal">
+        <div class="learn-rpa-section">
+          <div class="about-rpa-section-head">
+            <h2>Official Coaches</h2>
+          </div>
+          <div class="learn-coach-list">
+            ${coaches
+              .map(
+                (coach) => `
+                  <article class="learn-coach-card">
+                    <div class="learn-coach-avatar">${escapeHtml(initialsFor(coach.name))}</div>
+                    <div>
+                      <h3>${escapeHtml(coach.name)}</h3>
+                      <p>${escapeHtml(`${coach.role} / ${coach.city}`)}</p>
+                      <a href="mailto:${escapeHtml(coach.contact)}">${escapeHtml(coach.contact)}</a>
+                    </div>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+        <div class="learn-rpa-section" id="rulebook">
+          <div class="about-rpa-section-head">
+            <h2>Rulebook</h2>
+          </div>
+          <div class="learn-rulebook-card">
+            <span class="rpa-pill">Rulebook Placeholder</span>
+            <h3>Official rules and playing guidance</h3>
+            <p>Placeholder for linking the official rulebook, simplified rules, eligibility notes and code of conduct resources.</p>
+            <a href="contact.html" class="btn btn-primary">Add Rulebook Link</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="learn-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>FAQs</h2>
+        </div>
+        <div class="tourneys-faqs">
+          ${faqs
+            .map(
+              (item) => `
+                <details class="tourneys-faq-item">
+                  <summary>${escapeHtml(item.question)}</summary>
+                  <p>${escapeHtml(item.answer)}</p>
+                </details>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
+function renderShopCustomPage(page) {
+  const hero = page.hero || {};
+  const products = [
+    { title: "RPA Jersey", price: "Price placeholder", body: "Placeholder for official jersey details, sizes, colors, stock and product images.", image: "assets/logo.jpeg" },
+    { title: "RPA Jumper", price: "Price placeholder", body: "Placeholder for jumper details, fabric, sizes, variants and delivery notes.", image: "assets/logo.jpeg" },
+    { title: "RPA Cap", price: "Price placeholder", body: "Placeholder for cap details, color options, sizing and availability.", image: "assets/logo.jpeg" }
+  ];
+
+  return `
+    <section class="shop-rpa">
+      <section class="shop-rpa-hero reveal">
+        <div class="shop-rpa-copy">
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "RPA Shop")}</span>
+          <h1>
+            Official RPA
+            <span>Merchandise</span>
+          </h1>
+          <p>${escapeHtml(
+            hero.description ||
+              "A placeholder storefront for official jerseys, jumpers, caps and future merchandise drops."
+          )}</p>
+          <div class="shop-rpa-actions">
+            <a href="#shop-products" class="btn btn-primary">Browse Merchandise</a>
+            <a href="#payment" class="btn btn-ghost">Payment Details</a>
+          </div>
+        </div>
+        <div class="shop-rpa-visual">
+          <img src="assets/Membership Main Image.png" alt="RPA merchandise placeholder" class="shop-rpa-image" />
+        </div>
+      </section>
+
+      <section class="shop-rpa-section reveal" id="shop-products">
+        <div class="about-rpa-section-head">
+          <h2>Merchandise</h2>
+        </div>
+        <div class="shop-product-grid">
+          ${products
+            .map(
+              (item) => `
+                <article class="shop-product-card">
+                  <img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.title)}" />
+                  <div class="shop-product-copy">
+                    <span>${escapeHtml(item.price)}</span>
+                    <h3>${escapeHtml(item.title)}</h3>
+                    <p>${escapeHtml(item.body)}</p>
+                    <a href="#payment" class="btn btn-ghost">Order Placeholder</a>
+                  </div>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="shop-rpa-section reveal" id="payment">
+        <div class="shop-payment-panel">
+          <div>
+            <span class="rpa-pill">Payment Gateway Placeholder</span>
+            <h2>RPA bank account payment flow</h2>
+            <p>Placeholder for payment gateway integration that routes merchandise payments to the RPA bank account. Bank details, gateway provider, order confirmation and receipt workflow can be added later.</p>
+          </div>
+          <div class="shop-payment-steps">
+            <article><strong>1</strong><span>Select merchandise</span></article>
+            <article><strong>2</strong><span>Open gateway / UPI / bank transfer flow</span></article>
+            <article><strong>3</strong><span>Submit payment reference and receive confirmation</span></article>
+          </div>
         </div>
       </section>
     </section>
@@ -2117,6 +2366,18 @@ function setupDynamicPage() {
     return;
   }
 
+  if (pageName === "learn") {
+    setupVisualParallax(".learn-rpa-visual", "--learn-x", "--learn-y");
+    setupTiltCards([".learn-intro-card", ".learn-tutorial-card", ".learn-coach-card", ".learn-rulebook-card"]);
+    return;
+  }
+
+  if (pageName === "shop") {
+    setupVisualParallax(".shop-rpa-visual", "--shop-x", "--shop-y");
+    setupTiltCards([".shop-product-card", ".shop-payment-panel"]);
+    return;
+  }
+
   if (pageName === "media") {
     setupVisualParallax(".media-rpa-visual", "--media-x", "--media-y");
     setupTiltCards([".media-gallery-card", ".media-feature-panel", ".media-press-card", ".membership-benefit-card"]);
@@ -2275,6 +2536,18 @@ function renderPage() {
   }
   if (pageName === "membership") {
     root.innerHTML = renderMembershipCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "learn") {
+    root.innerHTML = renderLearnCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "shop") {
+    root.innerHTML = renderShopCustomPage(currentPage, currentData);
     setupReveal();
     setupDynamicPage();
     return;

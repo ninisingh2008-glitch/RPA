@@ -21,7 +21,7 @@ function setMode(mode) {
 function showAccount(user) {
   accountPanel.hidden = false;
   accountHeading.textContent = "You're signed in.";
-  accountCopy.textContent = "Your account is active and ready for platform updates, membership benefits, and future member features.";
+  accountCopy.textContent = `Your ${user.membershipType || "member"} account is active and ready for platform updates, membership benefits, and future member features.`;
   accountAction.textContent = "Go to Site";
   accountAction.href = "index.html";
 }
@@ -59,7 +59,8 @@ loginForm?.addEventListener("submit", async (event) => {
     fullName: identifier.includes("@") ? identifier.split("@")[0] : identifier,
     username: identifier,
     email: identifier.includes("@") ? identifier : "",
-    role: "member"
+    role: "member",
+    membershipType: "Member"
   };
   saveLocalUser(user);
   showAccount(user);
@@ -73,7 +74,8 @@ signupForm?.addEventListener("submit", async (event) => {
     fullName: String(form.get("fullName") || "").trim(),
     username: String(form.get("username") || "").trim(),
     email: String(form.get("email") || "").trim(),
-    role: "member"
+    role: "member",
+    membershipType: String(form.get("membershipType") || "Player")
   };
   saveLocalUser(user);
   signupMessage.textContent = "Account created on this browser.";
