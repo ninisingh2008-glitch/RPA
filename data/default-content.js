@@ -2,18 +2,20 @@ const pages = {
   home: {
     title: "Official Home of Rajasthan Pickleball",
     hero: {
-      eyebrow: "Official state platform for Rajasthan pickleball",
+      eyebrow: "Affiliated with the Indian Pickleball Association · Recognised by the Ministry of Youth Affairs and Sports",
       title: "Rajasthan's home of pickleball.",
+      tagline: "Building Rajasthan's grassroots-to-championship pathway for India's fastest-emerging sport.",
       description:
-        "Rajasthan Pickleball Association brings together tournaments, district development, official communication, and the Team Rajasthan pathway in one polished state-wide platform.",
+        "The official state association affiliated with the Indian Pickleball Association, which is recognised by the Ministry of Youth Affairs and Sports, and governs rankings, tournaments, and player development across India.",
       actions: [
         { label: "Explore Tournaments", href: "tournaments.html" },
-        { label: "Join Membership", href: "membership.html", secondary: true }
+        { label: "Become a Member", href: "membership.html", secondary: true }
       ],
       stats: [
-        { value: "33", label: "District touchpoints" },
-        { value: "70+", label: "State trial athletes" },
-        { value: "12", label: "Annual state events" }
+        { value: "33", label: "District Bodies", href: "districts.html" },
+        { value: "800+", label: "Registered Players", href: "membership.html" },
+        { value: "12", label: "Annual RPA Events", href: "tournaments.html" },
+        { value: "20+", label: "Affiliated Clubs & Academies", href: "membership.html" }
       ]
     },
     about: {

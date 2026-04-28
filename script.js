@@ -161,9 +161,18 @@ function setupHeroParallax() {
   });
 }
 
+function setupScrollParallax() {
+  const update = () => {
+    document.documentElement.style.setProperty("--scroll-y", `${window.scrollY}px`);
+  };
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+}
+
 function setupDynamicHome() {
   setupCountUp();
   setupHeroParallax();
+  setupScrollParallax();
   setupTiltCards([".rpa-tournament-card", ".rpa-feature-card", ".rpa-gallery-card", ".rpa-testimonial-card"]);
 }
 
@@ -429,13 +438,14 @@ function renderHome(data) {
                 <img src="assets/Ball.png" alt="" class="rpa-wordmark-ball" />
               </span>
             </h1>
+            ${hero.tagline ? `<p class="rpa-hero-tagline">${escapeHtml(hero.tagline)}</p>` : ""}
             <p>${escapeHtml(
               hero.description ||
-                "We promote, organise and grow the fastest-rising paddle sport in India from grassroots clinics to state selection trials."
+                "The official state association affiliated with the Indian Pickleball Association, recognised by the Ministry of Youth Affairs and Sports, governing rankings, tournaments, and player development across India."
             )}</p>
             <div class="rpa-hero-actions">
               <a href="tournaments.html" class="btn btn-primary">Upcoming Tournaments</a>
-              <a href="membership.html" class="btn btn-ghost">Join the Association</a>
+              <a href="membership.html" class="btn btn-ghost">Become a Member</a>
             </div>
           </div>
 
@@ -444,22 +454,35 @@ function renderHome(data) {
             <div class="rpa-orbit-badge">
               <img src="assets/logo.jpeg" alt="" class="rpa-orbit-logo" />
             </div>
+            <div class="rpa-motif rpa-motif--jodhpur">
+              <svg viewBox="0 0 40 32" fill="none" aria-hidden="true"><path d="M2 28h36M6 28V18h4v-4h4v4h4v-6h4v6h4v-4h4v4h4v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18 14V10h4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>Jodhpur</span>
+            </div>
+            <div class="rpa-motif rpa-motif--udaipur">
+              <svg viewBox="0 0 40 32" fill="none" aria-hidden="true"><path d="M2 26h36M8 26V16c4 0 6-3 6-6h8c0 3 2 6 6 6v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M16 10a4 4 0 0 1 8 0" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="7" r="2" fill="currentColor"/></svg>
+              <span>Udaipur</span>
+            </div>
+            <div class="rpa-motif rpa-motif--jaisalmer">
+              <svg viewBox="0 0 40 32" fill="none" aria-hidden="true"><path d="M4 28L20 6l16 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 28v-8h12v8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+              <span>Jaisalmer</span>
+            </div>
           </div>
         </section>
 
-        <section class="rpa-stats">
+        <section class="rpa-stats rpa-stats--4col">
           ${stats
             .map((stat, index) => {
-              const icons = ["map", "people", "calendar"];
-              return `
-                <article class="rpa-stat-card reveal">
-                  <div class="rpa-stat-icon">${iconMarkup(icons[index] || "map")}</div>
-                  <div>
-                    <strong>${escapeHtml(stat.value || "")}</strong>
-                    <span>${escapeHtml(stat.label || "")}</span>
-                  </div>
-                </article>
+              const icons = ["map", "people", "calendar", "clinics"];
+              const inner = `
+                <div class="rpa-stat-icon">${iconMarkup(icons[index] || "map")}</div>
+                <div>
+                  <strong>${escapeHtml(stat.value || "")}</strong>
+                  <span>${escapeHtml(stat.label || "")}</span>
+                </div>
               `;
+              return stat.href
+                ? `<a href="${escapeHtml(stat.href)}" class="rpa-stat-card reveal rpa-stat-card--link">${inner}</a>`
+                : `<article class="rpa-stat-card reveal">${inner}</article>`;
             })
             .join("")}
         </section>

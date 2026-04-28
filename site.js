@@ -18,6 +18,7 @@ let editMode = false;
 let pageSnapshot = null;
 let dataSnapshot = null;
 let editorBound = false;
+let _districtData = [];
 
 function escapeHtml(value) {
   return String(value ?? "")
@@ -806,38 +807,47 @@ function renderTournamentDetailPage(page, tournament, allTournaments) {
 function renderDistrictsCustomPage(page) {
   const hero = page.hero || {};
   const stats = hero.stats || [];
-  const districtImages = [
-    "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=1200",
-    "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=1200"
+
+  const allDistricts = [
+    { id: "ajmer", name: "Ajmer", nickname: "Gateway of Rajasthan", landmark: "Dargah Sharif & Ana Sagar Lake", feature: "Sufi heritage & pilgrimage", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "alwar", name: "Alwar", nickname: "Eastern Gateway", landmark: "Sariska Tiger Reserve", feature: "Bengal tigers & Bala Quila fort", image: "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "banswara", name: "Banswara", nickname: "City of Hundred Islands", landmark: "Mahi Dam & Beneshwar Dham", feature: "Tribal culture & river islands", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "baran", name: "Baran", nickname: "Land of Forests", landmark: "Shahbad Fort & Bhainsrorgarh", feature: "Dense forests & ancient forts", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "barmer", name: "Barmer", nickname: "Desert Frontier", landmark: "Kiradu Temples & Thar Desert", feature: "Desert festivals & folk embroidery", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "bharatpur", name: "Bharatpur", nickname: "Eastern Gateway", landmark: "Keoladeo National Park", feature: "UNESCO bird sanctuary", image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "bhilwara", name: "Bhilwara", nickname: "Textile City", landmark: "Menal Temples", feature: "Textile hub & ancient temple cluster", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "bikaner", name: "Bikaner", nickname: "Camel Country", landmark: "Junagarh Fort & Karni Mata Temple", feature: "Camel fairs & desert heritage", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "bundi", name: "Bundi", nickname: "City of Stepwells", landmark: "Taragarh Fort & Baori Stepwells", feature: "Ancient stepwells & palace frescoes", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "chittorgarh", name: "Chittorgarh", nickname: "City of Valour", landmark: "Chittorgarh Fort (UNESCO)", feature: "Rajput warrior heritage & hill fort", image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "churu", name: "Churu", nickname: "Gateway to Thar", landmark: "Shekhawati Painted Havelis", feature: "Open-air fresco murals", image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "dausa", name: "Dausa", nickname: "Ancient Dhundhar", landmark: "Bhangarh Fort", feature: "Historic forts & Mehandipur Balaji", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "dholpur", name: "Dholpur", nickname: "Land of Dholpur Stone", landmark: "Chambal Ravines & National Chambal Sanctuary", feature: "Gharial & dolphin habitat", image: "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "dungarpur", name: "Dungarpur", nickname: "City of Dungars", landmark: "Udai Bilas Palace & Beneshwar Dham", feature: "Tribal art & palace architecture", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "hanumangarh", name: "Hanumangarh", nickname: "Land of Ghaggar", landmark: "Kalibangan Archaeological Site", feature: "Harappan civilisation remains", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "jaipur", name: "Jaipur", nickname: "Pink City", landmark: "Hawa Mahal & Amer Fort", feature: "Rajasthan capital & Pink City heritage", image: "https://images.unsplash.com/photo-1599661046289-e31897846e41?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "jaisalmer", name: "Jaisalmer", nickname: "Golden City", landmark: "Jaisalmer Fort & Sam Sand Dunes", feature: "Living fort & Thar Desert dunes", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "jalor", name: "Jalor", nickname: "Land of Granite", landmark: "Jalor Fort", feature: "Gurjara-Pratihara hill fort", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "jhalawar", name: "Jhalawar", nickname: "City of Bells", landmark: "Jhalrapatan Suryamahal Temple", feature: "Temple architecture & Buddhist caves", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "jhunjhunu", name: "Jhunjhunu", nickname: "Land of Havelis", landmark: "Mandawa Painted Havelis", feature: "Shekhawati open-air art gallery", image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "jodhpur", name: "Jodhpur", nickname: "Blue City", landmark: "Mehrangarh Fort & Umaid Bhawan", feature: "Blue cityscape & Marwar heritage", image: "https://images.unsplash.com/photo-1477587458883-47145ed94245?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "karauli", name: "Karauli", nickname: "Red City", landmark: "Kaila Devi Temple & City Palace", feature: "Red sandstone architecture & tigers", image: "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "kota", name: "Kota", nickname: "Education City", landmark: "Chambal Garden & Kota Garh", feature: "Chambal river & education hub", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "nagaur", name: "Nagaur", nickname: "Land of Forts", landmark: "Nagaur Fort & Camel Fair", feature: "Medieval fort & Rajasthan Camel Fair", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "pali", name: "Pali", nickname: "Industrial Heartland", landmark: "Ranakpur Jain Temple", feature: "15th-century Jain marble masterpiece", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "pratapgarh", name: "Pratapgarh", nickname: "Tribal Belt", landmark: "Gaytri Temple Complex", feature: "Tribal heritage & temple art", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "rajsamand", name: "Rajsamand", nickname: "Lake District", landmark: "Rajsamand Lake & Nathdwara", feature: "Sacred lake & Srinathji temple", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "sawai-madhopur", name: "Sawai Madhopur", nickname: "City of Tigers", landmark: "Ranthambore Tiger Reserve (UNESCO)", feature: "Bengal tigers in a medieval fort", image: "https://images.unsplash.com/photo-1514222134-b57cbb8ce073?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "sikar", name: "Sikar", nickname: "Commercial Capital", landmark: "Salasar Balaji Temple & Shekhawati Havelis", feature: "Pilgrimage centre & painted havelis", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "sirohi", name: "Sirohi", nickname: "Hill Station", landmark: "Mount Abu & Dilwara Jain Temples", feature: "Rajasthan's only hill station", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "sri-ganganagar", name: "Sri Ganganagar", nickname: "Granary of Rajasthan", landmark: "Gurudwara Ber Sahib & Canal Network", feature: "Agricultural heartland of Rajasthan", image: "https://images.unsplash.com/photo-1496372412473-e8548ffd82bc?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" },
+    { id: "tonk", name: "Tonk", nickname: "City of Nawabs", landmark: "Arabic & Persian Library (Sunehri Kothi)", feature: "Nawabi heritage & Islamic art", image: "https://images.unsplash.com/photo-1524492412937-b28074a5d7da?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "emerging" },
+    { id: "udaipur", name: "Udaipur", nickname: "City of Lakes", landmark: "City Palace & Lake Pichola", feature: "Romantic lake city & Mewar heritage", image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=600", status: "active" }
   ];
-  const districtCards = [
-    { name: "Jaipur", meta: "Active district", image: districtImages[0] },
-    { name: "Jodhpur", meta: "Fast growing", image: districtImages[1] },
-    { name: "Udaipur", meta: "Lakeside network", image: districtImages[2] },
-    { name: "Kota", meta: "Youth pathway", image: districtImages[3] },
-    { name: "Ajmer", meta: "Emerging hub", image: districtImages[4] },
-    { name: "Bikaner", meta: "Expansion district", image: districtImages[5] }
-  ];
+
   const roadmap = [
-    {
-      icon: "map",
-      title: "Active Districts",
-      body: "33+ districts and counting with visible host-city activity and local organisers."
-    },
-    {
-      icon: "clinics",
-      title: "Upcoming Districts",
-      body: "Expansion soon into 10+ more districts through partner venues and local leads."
-    },
-    {
-      icon: "community",
-      title: "Partner Network",
-      body: "Schools, clubs and academies helping turn new interest into sustained play."
-    }
+    { icon: "map", title: "Active District Bodies", body: "Established bodies with local organisers, courts and regular play windows." },
+    { icon: "clinics", title: "Emerging Districts", body: "Districts where interest is building and activation is in progress." },
+    { icon: "community", title: "Clubs & Academies", body: "Affiliated institutions helping grow the sport at every level." }
   ];
 
   const heroActions = (hero.actions || [])
@@ -848,18 +858,45 @@ function renderDistrictsCustomPage(page) {
     )
     .join("");
 
+  const districtCards = allDistricts
+    .map(
+      (district) => `
+        <button
+          type="button"
+          class="districts-all-card"
+          data-district-id="${escapeHtml(district.id)}"
+          aria-label="View ${escapeHtml(district.name)} district details"
+        >
+          <img
+            src="${escapeHtml(district.image)}"
+            alt="${escapeHtml(district.name)} – ${escapeHtml(district.landmark)}"
+            class="districts-all-card-img"
+            loading="lazy"
+          />
+          <span class="districts-all-card-status districts-all-card-status--${escapeHtml(district.status)}">${district.status === "active" ? "Active" : "Emerging"}</span>
+          <div class="districts-all-card-copy">
+            <h3>${escapeHtml(district.name)}</h3>
+            <p>${escapeHtml(district.nickname || district.feature)}</p>
+          </div>
+        </button>
+      `
+    )
+    .join("");
+
+  _districtData = allDistricts;
+
   return `
     <section class="districts-rpa">
       <section class="districts-rpa-hero reveal">
         <div class="districts-rpa-copy">
-          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Statewide Network")}</span>
+          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "District Bodies Network")}</span>
           <h1>
             Pickleball Across
             <span>Rajasthan</span>
           </h1>
           <p>${escapeHtml(
             hero.description ||
-              "From cities to small towns, pickleball is growing everywhere. Explore our district network and be part of the movement."
+              "All 33 district bodies, each growing the sport locally. Click any district to see its landmark, identity, and contact details."
           )}</p>
           <div class="districts-rpa-actions">${heroActions}</div>
         </div>
@@ -888,28 +925,17 @@ function renderDistrictsCustomPage(page) {
       <section class="districts-rpa-grid reveal" id="district-network">
         <div class="districts-rpa-main">
           <div class="about-rpa-section-head">
-            <h2>Districts</h2>
+            <h2>All 33 District Bodies</h2>
           </div>
-          <div class="districts-rpa-cards">
-            ${districtCards
-              .map(
-                (district) => `
-                  <article class="districts-rpa-card">
-                    <img src="${escapeHtml(district.image)}" alt="${escapeHtml(district.name)} district" class="districts-rpa-card-image" />
-                    <div class="districts-rpa-card-copy">
-                      <h3>${escapeHtml(district.name)}</h3>
-                      <p>${escapeHtml(district.meta)}</p>
-                    </div>
-                  </article>
-                `
-              )
-              .join("")}
+          <p style="margin:0 0 0.5rem;font-size:0.9rem;color:#66777d;">Click a district to view its identity and contact details.</p>
+          <div class="districts-all-grid">
+            ${districtCards}
           </div>
         </div>
 
         <aside class="districts-rpa-side">
           <div class="about-rpa-section-head">
-            <h2>Expansion Roadmap</h2>
+            <h2>Network Overview</h2>
           </div>
           <div class="districts-rpa-roadmap">
             ${roadmap
@@ -1678,6 +1704,88 @@ function bindInlineEditing() {
   return;
 }
 
+function setupScrollParallax() {
+  const update = () => {
+    document.documentElement.style.setProperty("--scroll-y", `${window.scrollY}px`);
+  };
+  if (!window._rpaParallaxBound) {
+    window.addEventListener("scroll", update, { passive: true });
+    window._rpaParallaxBound = true;
+  }
+  update();
+}
+
+function openDistrictModal(district) {
+  function closeModal(overlay) {
+    overlay.remove();
+    document.body.style.overflow = "";
+  }
+
+  const overlay = document.createElement("div");
+  overlay.className = "district-modal-overlay";
+
+  const nickBadge = district.nickname
+    ? `<span class="district-modal-nickname">${escapeHtml(district.nickname)}</span>`
+    : "";
+
+  overlay.innerHTML = `
+    <div class="district-modal" role="dialog" aria-modal="true" aria-label="${escapeHtml(district.name)} District">
+      <img src="${escapeHtml(district.image)}" alt="${escapeHtml(district.name)} – ${escapeHtml(district.landmark)}" class="district-modal-image" />
+      <button type="button" class="district-modal-close" aria-label="Close">×</button>
+      <div class="district-modal-body">
+        <h2>${escapeHtml(district.name)}</h2>
+        ${nickBadge}
+        <div class="district-modal-landmark">
+          <svg viewBox="0 0 24 24"><path d="M12 2a7 7 0 0 0-7 7c0 5.27 7 13 7 13s7-7.73 7-13a7 7 0 0 0-7-7Zm0 9.5A2.5 2.5 0 1 1 12 6a2.5 2.5 0 0 1 0 5.5Z"/></svg>
+          <div class="district-modal-landmark-text">
+            <strong>${escapeHtml(district.landmark)}</strong>
+            <span>${escapeHtml(district.feature)}</span>
+          </div>
+        </div>
+        <div class="district-modal-contact">
+          <h4>District Body Contact</h4>
+          <div class="district-contact-row">
+            <svg viewBox="0 0 24 24"><path d="M8 12a4 4 0 1 1 0-8 4 4 0 0 1 0 8Zm8 1a3 3 0 1 1 0-6 3 3 0 0 1 0 6ZM2 21a6 6 0 0 1 12 0H2Zm12 0a5 5 0 0 1 8 0h-8Z"/></svg>
+            <span>District Coordinator: <strong>Appointment pending – Contact Head Office</strong></span>
+          </div>
+          <div class="district-contact-row">
+            <svg viewBox="0 0 24 24"><path d="M6.6 10.8c1.4 2.8 3.8 5.1 6.6 6.6l2.2-2.2c.3-.3.7-.4 1-.2 1.1.4 2.3.6 3.6.6.6 0 1 .4 1 1V20c0 .6-.4 1-1 1-9.4 0-17-7.6-17-17 0-.6.4-1 1-1h3.5c.6 0 1 .4 1 1 0 1.3.2 2.5.6 3.6.1.3 0 .7-.2 1L6.6 10.8Z"/></svg>
+            <span>Phone: <strong>+91 9116 123 456 (RPA Head Office)</strong></span>
+          </div>
+          <div class="district-contact-row">
+            <svg viewBox="0 0 24 24"><path d="M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2Zm0 4-8 5-8-5V6l8 5 8-5v2Z"/></svg>
+            <span>Email: <strong>districts@rajasthanpickleball.com</strong></span>
+          </div>
+          <div class="district-contact-row">
+            <svg viewBox="0 0 24 24"><path d="M17.5 2h-11C5.12 2 4 3.12 4 4.5v15C4 20.88 5.12 22 6.5 22h11c1.38 0 2.5-1.12 2.5-2.5v-15C20 3.12 18.88 2 17.5 2Zm-5.5 2a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3Zm0 14a5 5 0 1 1 0-10 5 5 0 0 1 0 10Z"/></svg>
+            <span>WhatsApp: <strong>Available on request via Head Office</strong></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+  document.body.style.overflow = "hidden";
+
+  overlay.querySelector(".district-modal-close").addEventListener("click", () => closeModal(overlay));
+  overlay.addEventListener("click", (e) => { if (e.target === overlay) closeModal(overlay); });
+  const onKey = (e) => { if (e.key === "Escape") { closeModal(overlay); document.removeEventListener("keydown", onKey); } };
+  document.addEventListener("keydown", onKey);
+}
+
+function setupDistrictModals() {
+  const districtMap = {};
+  _districtData.forEach((d) => { districtMap[d.id] = d; });
+
+  document.querySelectorAll("[data-district-id]").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const district = districtMap[btn.getAttribute("data-district-id")];
+      if (district) openDistrictModal(district);
+    });
+  });
+}
+
 function setupReveal() {
   const elements = document.querySelectorAll(".reveal");
   if (!elements.length || !("IntersectionObserver" in window)) {
@@ -1921,6 +2029,8 @@ function renderPage() {
     root.innerHTML = renderDistrictsCustomPage(currentPage, currentData);
     setupReveal();
     setupDynamicPage();
+    setupScrollParallax();
+    setupDistrictModals();
     return;
   }
   if (pageName === "media" || pageName === "news") {
