@@ -382,8 +382,26 @@ function renderAboutCustomPage(page, data) {
   }
 
   const journey = (journeySection.items || []).slice(0, 5);
+  const affiliation = {
+    title: "Official Affiliation - IPA",
+    body:
+      "Rajasthan Pickleball Association works within the national pickleball ecosystem through the Indian Pickleball Association, supporting recognised standards for events, rankings, player pathways, and organised development.",
+    href: "https://www.ipaofficial.com/"
+  };
+  const affiliatedClubs = [
+    { city: "Jaipur", name: "RPA Jaipur Club Network", contact: "connect@rajasthanpickleball.com" },
+    { city: "Udaipur", name: "Lake City Pickleball Academy", contact: "connect@rajasthanpickleball.com" },
+    { city: "Jodhpur", name: "Marwar Pickleball Circle", contact: "connect@rajasthanpickleball.com" },
+    { city: "Kota", name: "Kota Training & Youth Hub", contact: "connect@rajasthanpickleball.com" }
+  ];
+  const governanceItems = [
+    { title: "Constitution", body: "Core governance document, association objectives, membership rules, and operating principles." },
+    { title: "Board Members", body: "Office bearers and board representatives responsible for state-level direction and oversight." },
+    { title: "Committees", body: "Tournament, selection, district development, coaching, and disciplinary committees for focused execution." }
+  ];
 
   const heroActions = (hero.actions || [])
+    .filter((action) => !String(action.label || "").toLowerCase().includes("partner"))
     .slice(0, 2)
     .map(
       (action) =>
@@ -426,6 +444,19 @@ function renderAboutCustomPage(page, data) {
           .join("")}
       </section>
 
+      <section class="about-rpa-affiliation reveal">
+        <div class="about-rpa-affiliation-copy">
+          <span class="rpa-pill">Official Affiliation</span>
+          <h2>${escapeHtml(affiliation.title)}</h2>
+          <p>${escapeHtml(affiliation.body)}</p>
+          <a href="${escapeHtml(affiliation.href)}" target="_blank" rel="noopener" class="btn btn-primary">Visit IPA Website</a>
+        </div>
+        <div class="about-rpa-affiliation-card">
+          <strong>Indian Pickleball Association</strong>
+          <span>National pathway, event standards, recognised competition structure, and player development alignment.</span>
+        </div>
+      </section>
+
       <section class="about-rpa-section reveal">
         <div class="about-rpa-section-head">
           <h2>What We Do</h2>
@@ -436,6 +467,56 @@ function renderAboutCustomPage(page, data) {
               (item) => `
                 <article class="about-rpa-do-card">
                   <div class="about-rpa-do-icon">${iconMarkup(item.icon)}</div>
+                  <h3>${escapeHtml(item.title)}</h3>
+                  <p>${escapeHtml(item.body)}</p>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="about-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Affiliated Clubs & Academies</h2>
+        </div>
+        <div class="about-rpa-clubs-layout">
+          <div class="about-rpa-map-card">
+            <img src="assets/Districts Main Image.png" alt="Rajasthan district map and affiliated clubs" />
+          </div>
+          <div class="about-rpa-club-list">
+            ${affiliatedClubs
+              .map(
+                (club) => `
+                  <article class="about-rpa-club-card">
+                    <span>${escapeHtml(club.city)}</span>
+                    <h3>${escapeHtml(club.name)}</h3>
+                    <a href="mailto:${escapeHtml(club.contact)}">${escapeHtml(club.contact)}</a>
+                  </article>
+                `
+              )
+              .join("")}
+          </div>
+        </div>
+      </section>
+
+      <section class="about-rpa-president reveal">
+        <div>
+          <span class="rpa-pill">President's Message</span>
+          <h2>Message from the President</h2>
+        </div>
+        <p>President's message will be added here once shared by the RPA team.</p>
+      </section>
+
+      <section class="about-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Governance</h2>
+        </div>
+        <div class="about-rpa-governance-grid">
+          ${governanceItems
+            .map(
+              (item) => `
+                <article class="about-rpa-governance-card">
                   <h3>${escapeHtml(item.title)}</h3>
                   <p>${escapeHtml(item.body)}</p>
                 </article>
@@ -521,6 +602,26 @@ function renderTournamentsCustomPage(page, data) {
     "Who can participate?",
     "What are the age categories?",
     "What are the rules followed?"
+  ];
+  const resultArchiveItems = [
+    {
+      title: "Winners & Runners-up",
+      body: "Placeholder archive for champions, finalists, category-wise results, and podium records."
+    },
+    {
+      title: "Scores & Draws",
+      body: "Placeholder space for match scores, brackets, draw sheets, and downloadable result documents."
+    },
+    {
+      title: "Photos & Press Coverage",
+      body: "Placeholder links to event galleries, newspaper clips, IPA/RPA coverage, and media mentions."
+    }
+  ];
+  const handbookItems = [
+    { title: "Rulebook", body: "Placeholder for official rules, format notes, match procedures, and scoring references." },
+    { title: "Tournament Affiliation Guidelines", body: "Placeholder for event affiliation requirements, venue readiness, reporting, and approval process." },
+    { title: "Eligibility", body: "Placeholder for category eligibility, player documents, age groups, rankings, and entry requirements." },
+    { title: "Code of Conduct", body: "Placeholder for player, coach, parent, official, and organiser conduct expectations." }
   ];
 
   const heroActions = (hero.actions || [])
@@ -654,19 +755,16 @@ ${debugBanner}
       <section class="tourneys-rpa-columns reveal">
         <div class="tourneys-rpa-section">
           <div class="tourneys-rpa-section-head">
-            <h2>Past Events / Results</h2>
-            <a href="gallery.html">View all results</a>
+            <h2>Results Archive</h2>
+            <a href="gallery.html">Photos & coverage</a>
           </div>
-          <div class="tourneys-results-grid">
-            ${(allTournaments.length ? allTournaments : [])
-              .slice(0, 4)
+          <div class="tourneys-archive-grid">
+            ${resultArchiveItems
               .map(
-                (item, index) => `
-                  <article class="tourneys-result-card">
-                    <a href="tournaments.html?id=${encodeURIComponent(recordKey(item))}" class="tourneys-card-link">
-                    <img src="${escapeHtml(imageForTournament(item, index))}" alt="${escapeHtml(item.name || "Tournament")}" class="tourneys-result-image" />
-                    <h3>${escapeHtml(item.name || "Tournament")}</h3>
-                    </a>
+                (item) => `
+                  <article class="tourneys-archive-card">
+                    <h3>${escapeHtml(item.title)}</h3>
+                    <p>${escapeHtml(item.body)}</p>
                   </article>
                 `
               )
@@ -676,20 +774,38 @@ ${debugBanner}
 
         <div class="tourneys-rpa-section">
           <div class="tourneys-rpa-section-head">
-            <h2>FAQs</h2>
+            <h2>Handbook</h2>
           </div>
-          <div class="tourneys-faqs">
-            ${faqItems
+          <div class="tourneys-handbook-grid">
+            ${handbookItems
               .map(
                 (item) => `
-                  <details class="tourneys-faq-item">
-                    <summary>${escapeHtml(item)}</summary>
-                    <p>Please contact the tournament desk for the latest event-specific guidance and registration details.</p>
-                  </details>
+                  <article class="tourneys-handbook-card">
+                    <h3>${escapeHtml(item.title)}</h3>
+                    <p>${escapeHtml(item.body)}</p>
+                  </article>
                 `
               )
               .join("")}
           </div>
+        </div>
+      </section>
+
+      <section class="tourneys-rpa-section reveal">
+        <div class="tourneys-rpa-section-head">
+          <h2>FAQs</h2>
+        </div>
+        <div class="tourneys-faqs">
+          ${faqItems
+            .map(
+              (item) => `
+                <details class="tourneys-faq-item">
+                  <summary>${escapeHtml(item)}</summary>
+                  <p>Please contact the tournament desk for the latest event-specific guidance and registration details.</p>
+                </details>
+              `
+            )
+            .join("")}
         </div>
       </section>
 
@@ -967,7 +1083,7 @@ function renderDistrictsCustomPage(page) {
           </h1>
           <p>${escapeHtml(
             hero.description ||
-              "All 33 district bodies, each growing the sport locally. Click any district to see its landmark, identity, and contact details."
+              "Explore Rajasthan's district bodies, emerging playing hubs, and local development network. Each district can hold contacts, affiliated clubs, academies, venues, and activation updates."
           )}</p>
           <div class="districts-rpa-actions">${heroActions}</div>
         </div>
@@ -1028,12 +1144,12 @@ function renderDistrictsCustomPage(page) {
 
       <section class="about-rpa-banner reveal">
         <div class="about-rpa-banner-copy">
-          <h2>Help grow Rajasthan's district network.</h2>
-          <p>Bring the sport to new cities through hosting, coaching, venue support and community building.</p>
+          <h2>District development updates will live here.</h2>
+          <p>Use this space for district committees, venue status, club listings, academy contacts, local calendars and growth notes.</p>
         </div>
         <div class="about-rpa-actions">
-          <a href="contact.html" class="btn btn-light">Partner With Us</a>
           <a href="tournaments.html" class="btn btn-outline-light">See Events</a>
+          <a href="contact.html" class="btn btn-light">Contact District Desk</a>
         </div>
       </section>
     </section>
@@ -1044,10 +1160,34 @@ function renderMembershipCustomPage(page) {
   const hero = page.hero || {};
   const sections = page.sections || [];
   const benefits = sections.find((section) => section.kicker?.toLowerCase().includes("why join"))?.items || [];
-  const categories = sections.find((section) => section.kicker?.toLowerCase().includes("membership categories"))?.items || [];
-  const process = sections.find((section) => section.layout === "timeline")?.items || [];
   const faqs = sections.find((section) => section.layout === "faq")?.items || [];
   const ctaSection = sections.find((section) => section.layout === "cta") || {};
+  const registrationCategories = [
+    {
+      title: "Register as Player",
+      body: "Placeholder copy for player registration eligibility, pathway access, tournament participation, and member profile details.",
+      href: "auth.html#player-registration",
+      cta: "Player Registration"
+    },
+    {
+      title: "Register as Club/Academy",
+      body: "Placeholder copy for club or academy affiliation, venue details, coaching structure, and district coordination.",
+      href: "contact.html#club-academy-registration",
+      cta: "Club/Academy Registration"
+    },
+    {
+      title: "Tournament Registration",
+      body: "Placeholder copy for tournament entry, event affiliation, draws, results submission, and player ranking workflows.",
+      href: "tournaments.html#tournament-registration",
+      cta: "Tournament Registration"
+    }
+  ];
+  const tournamentBenefits = [
+    "Placeholder: tournament affiliation helps create recognised event records and consistent reporting.",
+    "Placeholder: affiliated tournaments can align with rating/ranking workflows including PWR-related documentation.",
+    "Placeholder: organisers can publish draws, results, photos, and press coverage through the RPA ecosystem.",
+    "Placeholder: event standards, eligibility, and code of conduct can be linked to the tournament handbook."
+  ];
 
   const heroActions = (hero.actions || [])
     .slice(0, 2)
@@ -1078,9 +1218,45 @@ function renderMembershipCustomPage(page) {
         </div>
       </section>
 
+      <section class="membership-rpa-section reveal" id="membership-registration">
+        <div class="about-rpa-section-head">
+          <h2>Registration Categories</h2>
+        </div>
+        <div class="membership-register-grid">
+          ${registrationCategories
+            .map(
+              (item, index) => `
+                <article class="membership-register-card membership-register-card--${index + 1}">
+                  <div class="membership-benefit-icon">${iconMarkup(["people", "clinics", "trophy"][index] || "map")}</div>
+                  <h3>${escapeHtml(item.title || "")}</h3>
+                  <p>${escapeHtml(item.body || "")}</p>
+                  <a href="${escapeHtml(item.href)}" class="btn ${index === 2 ? "btn-primary" : "btn-ghost"}">${escapeHtml(item.cta)}</a>
+                </article>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="membership-rpa-section reveal">
+        <div class="about-rpa-section-head">
+          <h2>Tournament Affiliation Benefits</h2>
+        </div>
+        <div class="membership-affiliation-panel">
+          <div>
+            <span class="rpa-pill">PWR / Document Placeholder</span>
+            <h3>Benefits of Tournament Affiliation</h3>
+            <p>Placeholder section for explaining tournament affiliation, PWR-related use, and the document that will be added later.</p>
+          </div>
+          <ul>
+            ${tournamentBenefits.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}
+          </ul>
+        </div>
+      </section>
+
       <section class="membership-rpa-section reveal" id="membership-benefits">
         <div class="about-rpa-section-head">
-          <h2>Why Join RPA?</h2>
+          <h2>Placeholder Member Benefits</h2>
         </div>
         <div class="membership-benefits-grid">
           ${benefits
@@ -1089,46 +1265,6 @@ function renderMembershipCustomPage(page) {
                 <article class="membership-benefit-card">
                   <div class="membership-benefit-icon">${iconMarkup(["calendar", "community", "people", "flag"][index] || "map")}</div>
                   <h3>${escapeHtml(item.title || "")}</h3>
-                  <p>${escapeHtml(item.body || "")}</p>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
-      </section>
-
-      <section class="membership-rpa-section reveal">
-        <div class="about-rpa-section-head">
-          <h2>Membership Categories</h2>
-        </div>
-        <div class="membership-plan-grid">
-          ${categories
-            .map(
-              (item, index) => `
-                <article class="membership-plan-card membership-plan-card--${index + 1}">
-                  <div class="membership-plan-head">
-                    <h3>${escapeHtml(item.title || "")}</h3>
-                    <span>${escapeHtml(item.meta || "")}</span>
-                  </div>
-                  <p>${escapeHtml(item.body || "")}</p>
-                  <a href="auth.html#signup" class="btn ${index === 1 ? "btn-primary" : "btn-ghost"}">Join Now</a>
-                </article>
-              `
-            )
-            .join("")}
-        </div>
-      </section>
-
-      <section class="membership-rpa-section reveal">
-        <div class="about-rpa-section-head">
-          <h2>How It Works</h2>
-        </div>
-        <div class="membership-process-grid">
-          ${process
-            .map(
-              (item) => `
-                <article class="membership-process-card">
-                  <span class="membership-process-step">${escapeHtml(item.year || "")}</span>
                   <p>${escapeHtml(item.body || "")}</p>
                 </article>
               `
@@ -1251,21 +1387,35 @@ function renderGalleryEventsPage(page, data) {
   const events = data.galleryEvents || [];
   const selectedEvent = getSelectedRecord(events, "title");
   if (selectedEvent) return renderGalleryEventDetailPage(page, selectedEvent, data.galleryImages || [], events);
+  const pressItems = [
+    {
+      title: "IPA Coverage Placeholder",
+      body: "Placeholder for IPA article links, national coverage, federation announcements, and tournament reports."
+    },
+    {
+      title: "RPA Press Placeholder",
+      body: "Placeholder for RPA media mentions, state announcements, local newspaper coverage, and event summaries."
+    },
+    {
+      title: "Media Kit Placeholder",
+      body: "Placeholder for logos, official statements, photo credits, press contacts, and downloadable assets."
+    }
+  ];
 
   return `
     <section class="media-rpa">
       <section class="media-rpa-hero reveal">
         <div class="media-rpa-copy">
-          <span class="rpa-pill">${escapeHtml(hero.eyebrow || "Gallery")}</span>
+          <span class="rpa-pill">Media</span>
           <h1>
-            Event
-            <span>Gallery</span>
+            RPA
+            <span>Media</span>
           </h1>
           <p>${escapeHtml(
-            hero.description || "Open an event gallery to see all locally published photos."
+            hero.description || "Placeholder media hub for event galleries, press coverage, articles, and official RPA updates."
           )}</p>
           <div class="media-rpa-actions">
-            <a href="tournaments.html" class="btn btn-primary">View Tournaments</a>
+            <a href="#media-gallery" class="btn btn-primary">Open Gallery</a>
             <a href="contact.html" class="btn btn-ghost">Media Enquiries</a>
           </div>
         </div>
@@ -1276,8 +1426,16 @@ function renderGalleryEventsPage(page, data) {
 
       <section class="media-rpa-section reveal" id="media-gallery">
         <div class="about-rpa-section-head">
-          <h2>Gallery Events</h2>
+          <h2>Gallery</h2>
         </div>
+        <article class="media-feature-panel">
+          <img src="assets/Tournaments Main Image.png" alt="IPA Nationals 2025 placeholder" />
+          <div>
+            <span class="rpa-pill">IPA Nationals 2025</span>
+            <h3>IPA Nationals 2025 - Bengaluru</h3>
+            <p>Placeholder content block for images, videos, and brief event notes from IPA Nationals 2025 held in Bengaluru. Footage links can be added here when provided.</p>
+          </div>
+        </article>
         <div class="media-gallery-grid">
           ${events
             .map(
@@ -1289,6 +1447,25 @@ function renderGalleryEventsPage(page, data) {
                     <p>${escapeHtml([item.category, formatDate(item.date), item.location].filter(Boolean).join(" / "))}</p>
                   </div>
                 </a>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+
+      <section class="media-rpa-section reveal" id="media-press">
+        <div class="about-rpa-section-head">
+          <h2>Press</h2>
+        </div>
+        <div class="media-press-grid">
+          ${pressItems
+            .map(
+              (item) => `
+                <article class="media-press-card">
+                  <h3>${escapeHtml(item.title)}</h3>
+                  <p>${escapeHtml(item.body)}</p>
+                  <a href="contact.html">Add coverage link</a>
+                </article>
               `
             )
             .join("")}
@@ -1936,19 +2113,19 @@ function setupDynamicPage() {
 
   if (pageName === "membership") {
     setupVisualParallax(".membership-rpa-visual", "--membership-x", "--membership-y");
-    setupTiltCards([".membership-benefit-card", ".membership-plan-card", ".membership-process-card"]);
+    setupTiltCards([".membership-benefit-card", ".membership-register-card", ".membership-plan-card", ".membership-process-card"]);
     return;
   }
 
   if (pageName === "media") {
     setupVisualParallax(".media-rpa-visual", "--media-x", "--media-y");
-    setupTiltCards([".media-gallery-card", ".membership-benefit-card"]);
+    setupTiltCards([".media-gallery-card", ".media-feature-panel", ".media-press-card", ".membership-benefit-card"]);
     return;
   }
 
   if (pageName === "gallery") {
     setupVisualParallax(".media-rpa-visual", "--media-x", "--media-y");
-    setupTiltCards([".media-gallery-card", ".gallery-event-image-card"]);
+    setupTiltCards([".media-gallery-card", ".media-feature-panel", ".media-press-card", ".gallery-event-image-card"]);
     return;
   }
 

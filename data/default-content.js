@@ -332,10 +332,9 @@ const pages = {
       eyebrow: "Statewide Network",
       title: "Pickleball Across Rajasthan",
       description:
-        "From cities to small towns, pickleball is growing everywhere. Explore our district network and be part of the movement.",
+        "Explore Rajasthan's district bodies, emerging playing hubs, affiliated clubs, academies, venues and local development updates.",
       actions: [
-        { label: "Explore Districts", href: "#district-network" },
-        { label: "Partner With Us", href: "contact.html", secondary: true }
+        { label: "Explore Districts", href: "#district-network" }
       ],
       stats: [
         { value: "33+", label: "Active districts" },
@@ -416,7 +415,7 @@ const pages = {
         items: [
           { title: "Representation at Nationals", body: "Formal state representation on bigger competitive stages.", meta: "Exposure" },
           { title: "Team Achievements", body: "Podiums, rankings, standout performances, and notable milestones.", meta: "Results" },
-          { title: "Gallery", body: "Photos and visual proof from camps, trials, and major events.", meta: "Media" }
+          { title: "Media", body: "Photos, press links, videos, and visual proof from camps, trials, and major events.", meta: "Media" }
         ]
       },
       {
@@ -441,15 +440,15 @@ const pages = {
   media: {
     title: "Media",
     hero: {
-      eyebrow: "Media & Gallery",
-      title: "Photos, updates and stories from across Rajasthan.",
+      eyebrow: "Media",
+      title: "Media, updates and stories from across Rajasthan.",
       description:
         "Explore event galleries, official updates, growth stories and community moments from Rajasthan pickleball.",
       actions: [
         { label: "Browse Gallery", href: "#media-gallery" },
         { label: "Contact Media Desk", href: "contact.html", secondary: true }
       ],
-      tags: ["Gallery", "Announcements", "Event reports", "Growth updates"]
+      tags: ["Gallery", "Press", "Announcements", "Event reports"]
     },
     sections: [
       {
@@ -490,15 +489,15 @@ const pages = {
   news: {
     title: "Media",
     hero: {
-      eyebrow: "Media & Gallery",
-      title: "Photos, updates and stories from across Rajasthan.",
+      eyebrow: "Media",
+      title: "Media, updates and stories from across Rajasthan.",
       description:
         "Explore event galleries, official updates, growth stories and community moments from Rajasthan pickleball.",
       actions: [
         { label: "Browse Gallery", href: "#media-gallery" },
         { label: "Contact Media Desk", href: "contact.html", secondary: true }
       ],
-      tags: ["Gallery", "Announcements", "Event reports", "Growth updates"]
+      tags: ["Gallery", "Press", "Announcements", "Event reports"]
     },
     sections: [
       {

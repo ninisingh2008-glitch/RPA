@@ -3311,9 +3311,9 @@ a.rpa-stat-card--link:hover {
 .rpa-instagram-head h2 {
   margin: 0;
   color: #0d6170;
-  font-size: clamp(1.25rem, 2vw, 1.85rem);
+  font-size: clamp(0.78rem, 1.2vw, 1.2rem);
   letter-spacing: 0;
-  overflow-wrap: anywhere;
+  white-space: nowrap;
 }
 
 .rpa-instagram-head a {
@@ -4239,7 +4239,9 @@ body[data-page="tournaments"] .landing-auth .btn-primary {
 .tourneys-category-card,
 .tourneys-calendar,
 .tourneys-result-card,
-.tourneys-faq-item {
+.tourneys-faq-item,
+.tourneys-archive-card,
+.tourneys-handbook-card {
   border: 1px solid rgba(13, 86, 98, 0.08);
   border-radius: 18px;
   background: #fffefa;
@@ -4302,6 +4304,41 @@ body[data-page="tournaments"] .landing-auth .btn-primary {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 0.8rem;
+}
+
+.tourneys-archive-grid,
+.tourneys-handbook-grid {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.tourneys-archive-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.tourneys-handbook-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.tourneys-archive-card,
+.tourneys-handbook-card {
+  min-height: 160px;
+  padding: 1rem;
+}
+
+.tourneys-archive-card h3,
+.tourneys-handbook-card h3 {
+  margin: 0 0 0.55rem;
+  color: #173f49;
+  font-size: 1rem;
+}
+
+.tourneys-archive-card p,
+.tourneys-handbook-card p {
+  margin: 0;
+  color: #64777e;
+  font-size: 0.88rem;
+  line-height: 1.6;
 }
 
 .tourneys-result-card {
@@ -4616,6 +4653,11 @@ body[data-page="state-team"] .landing-auth .btn-primary {
   padding: 0 0 1.25rem;
 }
 
+.about-rpa .reveal {
+  opacity: 1;
+  transform: none;
+}
+
 .about-rpa-hero {
   display: grid;
   grid-template-columns: minmax(0, 0.72fr) minmax(0, 1.28fr);
@@ -4692,7 +4734,10 @@ body[data-page="state-team"] .landing-auth .btn-primary {
 .about-rpa-info,
 .about-rpa-do-card,
 .about-rpa-person-card,
-.about-rpa-milestone {
+.about-rpa-milestone,
+.about-rpa-club-card,
+.about-rpa-governance-card,
+.about-rpa-affiliation-card {
   border: 1px solid rgba(13, 86, 98, 0.08);
   border-radius: 18px;
   background: #fffefa;
@@ -4704,7 +4749,10 @@ body[data-page="state-team"] .landing-auth .btn-primary {
 .about-rpa-info:hover,
 .about-rpa-do-card:hover,
 .about-rpa-person-card:hover,
-.about-rpa-milestone:hover {
+.about-rpa-milestone:hover,
+.about-rpa-club-card:hover,
+.about-rpa-governance-card:hover,
+.about-rpa-affiliation-card:hover {
   box-shadow: 0 24px 34px rgba(40, 48, 55, 0.1);
 }
 
@@ -4804,6 +4852,131 @@ body[data-page="state-team"] .landing-auth .btn-primary {
 
 .about-rpa-do-card p {
   font-size: 0.76rem;
+}
+
+.about-rpa-affiliation {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(260px, 0.8fr);
+  gap: 1rem;
+  align-items: stretch;
+  margin: 1rem clamp(28px, 4vw, 56px) 0;
+  padding: 1.1rem;
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(255, 253, 250, 0.98), rgba(234, 246, 248, 0.9)),
+    radial-gradient(circle at 100% 0, rgba(239, 140, 34, 0.16), transparent 32%);
+  border: 1px solid rgba(13, 86, 98, 0.08);
+  box-shadow: 0 14px 24px rgba(40, 48, 55, 0.04);
+}
+
+.about-rpa-affiliation-copy {
+  padding: 0.5rem;
+}
+
+.about-rpa-affiliation-copy h2,
+.about-rpa-president h2 {
+  margin: 0.85rem 0 0.7rem;
+  color: #165867;
+  font-size: clamp(1.75rem, 3vw, 2.6rem);
+}
+
+.about-rpa-affiliation-copy p,
+.about-rpa-president p {
+  max-width: 62rem;
+  color: #60737a;
+}
+
+.about-rpa-affiliation-card {
+  display: grid;
+  align-content: end;
+  padding: 1.2rem;
+  background: linear-gradient(160deg, #0f7487, #0a5664);
+}
+
+.about-rpa-affiliation-card strong {
+  display: block;
+  margin-bottom: 0.55rem;
+  color: #fff;
+  font-size: 1.25rem;
+}
+
+.about-rpa-affiliation-card span {
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.about-rpa-clubs-layout {
+  display: grid;
+  grid-template-columns: minmax(280px, 0.9fr) minmax(0, 1.1fr);
+  gap: 1rem;
+}
+
+.about-rpa-map-card {
+  overflow: hidden;
+  border-radius: 20px;
+  border: 1px solid rgba(13, 86, 98, 0.08);
+  background: #fffefa;
+  box-shadow: 0 14px 24px rgba(40, 48, 55, 0.04);
+}
+
+.about-rpa-map-card img {
+  width: 100%;
+  height: 100%;
+  min-height: 340px;
+  object-fit: cover;
+}
+
+.about-rpa-club-list,
+.about-rpa-governance-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.about-rpa-club-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.about-rpa-club-card,
+.about-rpa-governance-card {
+  padding: 1rem;
+}
+
+.about-rpa-club-card span {
+  color: #d6831a;
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.about-rpa-club-card h3,
+.about-rpa-governance-card h3 {
+  margin: 0.45rem 0 0.45rem;
+  color: #173f49;
+  font-size: 1.05rem;
+}
+
+.about-rpa-club-card a {
+  color: #0f6a77;
+  font-size: 0.86rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+}
+
+.about-rpa-president {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.55fr) minmax(0, 1fr);
+  gap: 1rem;
+  align-items: center;
+  margin: 1rem clamp(28px, 4vw, 56px) 0;
+  padding: 1.25rem;
+  border-radius: 24px;
+  background: linear-gradient(160deg, #fffefa, #fff1de);
+  border: 1px solid rgba(13, 86, 98, 0.08);
+  box-shadow: 0 14px 24px rgba(40, 48, 55, 0.04);
+}
+
+.about-rpa-governance-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .about-rpa-people-grid {
@@ -5030,7 +5203,9 @@ body[data-page="contact"] {
 
 .membership-benefits-grid,
 .membership-plan-grid,
+.membership-register-grid,
 .media-gallery-grid,
+.media-press-grid,
 .media-update-grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5040,8 +5215,11 @@ body[data-page="contact"] {
 .membership-benefit-card,
 .membership-plan-card,
 .membership-process-card,
+.membership-register-card,
 .membership-voice-card,
 .media-gallery-card,
+.media-feature-panel,
+.media-press-card,
 .contact-rpa-card,
 .contact-rpa-detail-row,
 .card-shell {
@@ -5080,6 +5258,89 @@ body[data-page="contact"] {
 
 .membership-plan-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.membership-register-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.membership-register-card {
+  display: flex;
+  min-height: 280px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 1.15rem;
+}
+
+.membership-register-card h3,
+.media-feature-panel h3,
+.media-press-card h3 {
+  margin: 0 0 0.45rem;
+  color: #173a43;
+}
+
+.membership-register-card p,
+.media-feature-panel p,
+.media-press-card p {
+  margin: 0;
+  color: #657b83;
+}
+
+.membership-register-card .btn {
+  margin-top: auto;
+}
+
+.membership-affiliation-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  gap: 1.2rem;
+  align-items: center;
+  padding: clamp(1.1rem, 2vw, 1.6rem);
+  border: 1px solid rgba(13, 86, 98, 0.1);
+  border-radius: 24px;
+  background:
+    linear-gradient(135deg, rgba(14, 106, 121, 0.08), rgba(240, 163, 57, 0.1)),
+    rgba(255, 253, 249, 0.96);
+  box-shadow: 0 18px 42px rgba(24, 42, 48, 0.07);
+}
+
+.membership-affiliation-panel h3 {
+  margin: 0.75rem 0 0.45rem;
+  color: #0b5c70;
+}
+
+.membership-affiliation-panel p {
+  margin: 0;
+  color: #5d737b;
+}
+
+.membership-affiliation-panel ul {
+  display: grid;
+  gap: 0.75rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.membership-affiliation-panel li {
+  position: relative;
+  padding: 0.85rem 0.9rem 0.85rem 2.2rem;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.72);
+  color: #28464f;
+  font-weight: 700;
+}
+
+.membership-affiliation-panel li::before {
+  content: "";
+  position: absolute;
+  left: 0.85rem;
+  top: 1.12rem;
+  width: 0.55rem;
+  height: 0.55rem;
+  border-radius: 50%;
+  background: #ef8c22;
+  box-shadow: 0 0 0 5px rgba(239, 140, 34, 0.14);
 }
 
 .membership-plan-card {
@@ -5158,6 +5419,46 @@ body[data-page="contact"] {
 .media-gallery-card {
   display: block;
   color: inherit;
+}
+
+.media-feature-panel {
+  display: grid;
+  grid-template-columns: minmax(220px, 0.82fr) minmax(0, 1.18fr);
+  gap: clamp(1rem, 2vw, 1.4rem);
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  overflow: hidden;
+}
+
+.media-feature-panel img {
+  width: 100%;
+  min-height: 220px;
+  aspect-ratio: 1.45 / 1;
+  object-fit: cover;
+  border-radius: 18px;
+}
+
+.media-feature-panel h3 {
+  margin-top: 0.65rem;
+  font-size: clamp(1.45rem, 3vw, 2.2rem);
+}
+
+.media-press-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.media-press-card {
+  display: grid;
+  gap: 0.7rem;
+  min-height: 220px;
+  padding: 1.1rem;
+}
+
+.media-press-card a {
+  align-self: end;
+  color: #0b6174;
+  font-weight: 800;
 }
 
 .gallery-lightbox {
@@ -5642,9 +5943,16 @@ body[data-page="contact"] {
   .about-rpa-do-grid,
   .about-rpa-people-grid,
   .about-rpa-timeline,
+  .about-rpa-affiliation,
+  .about-rpa-clubs-layout,
+  .about-rpa-club-list,
+  .about-rpa-governance-grid,
+  .about-rpa-president,
   .districts-rpa-stats,
   .membership-benefits-grid,
+  .membership-register-grid,
   .media-gallery-grid,
+  .media-press-grid,
   .media-update-grid,
   .contact-rpa-strip {
     grid-template-columns: 1fr 1fr;
@@ -5660,6 +5968,8 @@ body[data-page="contact"] {
   .districts-rpa-hero,
   .districts-rpa-grid,
   .membership-rpa-columns,
+  .membership-affiliation-panel,
+  .media-feature-panel,
   .contact-rpa-grid {
     grid-template-columns: 1fr;
   }
@@ -5679,10 +5989,17 @@ body[data-page="contact"] {
   .about-rpa-do-grid,
   .about-rpa-people-grid,
   .about-rpa-timeline,
+  .about-rpa-affiliation,
+  .about-rpa-clubs-layout,
+  .about-rpa-club-list,
+  .about-rpa-governance-grid,
+  .about-rpa-president,
   .districts-rpa-stats,
   .districts-rpa-cards,
   .membership-benefits-grid,
+  .membership-register-grid,
   .media-gallery-grid,
+  .media-press-grid,
   .media-update-grid,
   .contact-rpa-strip {
     grid-template-columns: 1fr;
@@ -5696,6 +6013,8 @@ body[data-page="contact"] {
   .about-rpa-hero,
   .about-rpa-topcards,
   .about-rpa-section,
+  .about-rpa-affiliation,
+  .about-rpa-president,
   .about-rpa-banner,
   .membership-rpa-hero,
   .membership-rpa-section,
