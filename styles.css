@@ -3954,6 +3954,94 @@ a.rpa-stat-card--link:hover {
 }
 
 @media (max-width: 640px) {
+  html,
+  body {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .landing-home .landing-nav {
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    padding: 12px 14px;
+  }
+
+  .landing-home .brand {
+    order: 1;
+    max-width: calc(100% - 54px);
+  }
+
+  .landing-home .brand-logo {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+  }
+
+  .landing-home .brand-text strong {
+    font-size: 0.95rem;
+  }
+
+  .landing-home .brand-text span {
+    max-width: 19ch;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    white-space: normal;
+  }
+
+  .landing-nav-toggle {
+    order: 2;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(15, 106, 119, 0.08);
+  }
+
+  .landing-nav-toggle span {
+    margin: 4px auto;
+  }
+
+  .landing-nav-links.is-open,
+  .landing-auth.is-open {
+    position: static;
+    flex: 0 0 100%;
+    border-bottom: 0;
+    background: transparent;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .landing-nav-links.is-open {
+    order: 3;
+    gap: 0.85rem;
+    padding-top: 0.85rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .landing-auth.is-open {
+    order: 4;
+    padding-top: 0.25rem;
+    padding-bottom: 0.2rem;
+  }
+
+  .rpa-hero {
+    gap: 1rem;
+    padding: 1.25rem 1rem 1rem;
+    overflow: hidden;
+  }
+
+  .rpa-hero-copy {
+    min-width: 0;
+    padding: 0;
+  }
+
+  .rpa-pill {
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    line-height: 1.45;
+  }
+
   .rpa-city-strip {
     min-height: 0;
     border-radius: 26px;
@@ -3979,22 +4067,126 @@ a.rpa-stat-card--link:hover {
   }
 
   .rpa-hero h1 {
-    font-size: 2.8rem;
+    max-width: 100%;
+    margin: 0.85rem 0;
+    font-size: clamp(2.35rem, 12vw, 2.85rem);
+    letter-spacing: 0;
   }
 
   .rpa-hero-visual {
-    min-height: 320px;
+    min-height: 260px;
+    border-radius: 20px;
   }
 
   .rpa-hero-image {
-    min-height: 320px;
+    min-height: 260px;
   }
 
   .rpa-wordmark-ball {
     width: 0.82em;
     height: 0.82em;
-    right: -0.3em;
+    right: -0.2em;
     transform: translateY(-40%);
+  }
+
+  .rpa-hero-tagline {
+    max-width: 100%;
+    padding: 0.7rem 0.85rem;
+    font-size: 0.95rem;
+  }
+
+  .rpa-hero p {
+    max-width: 100%;
+    font-size: 1rem;
+  }
+
+  .rpa-hero-actions {
+    gap: 0.7rem;
+  }
+
+  .rpa-hero-actions .btn {
+    width: 100%;
+    min-height: 54px;
+  }
+
+  .rpa-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .rpa-stat-card {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+    min-width: 0;
+    border-radius: 16px;
+  }
+
+  .rpa-stat-card strong {
+    font-size: 1.55rem;
+  }
+
+  .rpa-stat-card span {
+    font-size: 0.82rem;
+    line-height: 1.35;
+  }
+
+  .rpa-section-grid,
+  .rpa-footer {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .rpa-section-head {
+    align-items: flex-start;
+    gap: 0.65rem;
+  }
+
+  .rpa-section-head h2 {
+    font-size: 0.9rem;
+  }
+
+  .rpa-section-head a {
+    font-size: 0.78rem;
+    text-align: right;
+  }
+
+  .rpa-feature-grid {
+    margin-right: -1rem;
+    padding-right: 1rem;
+  }
+
+  .rpa-feature-card {
+    flex-basis: min(270px, 78vw);
+    min-height: 220px;
+  }
+
+  .rpa-instagram-band,
+  .rpa-city-strip,
+  .rpa-banner {
+    margin-left: 1rem;
+    margin-right: 1rem;
+  }
+
+  .rpa-instagram-band {
+    padding: 1rem;
+    border-radius: 20px;
+  }
+
+  .rpa-instagram-head {
+    padding: 0;
+  }
+
+  .rpa-instagram-head h2 {
+    white-space: normal;
+    font-size: 1.08rem;
+  }
+
+  .rpa-testimonial-card {
+    width: min(300px, 82vw);
+    min-height: 0;
   }
 
   .rpa-orbit-badge {
@@ -4028,6 +4220,14 @@ a.rpa-stat-card--link:hover {
   .rpa-stat-card,
   .rpa-testimonial-card {
     padding: 1rem;
+  }
+
+  .rpa-subscribe-form {
+    flex-direction: column;
+  }
+
+  .rpa-subscribe-form button {
+    width: 100%;
   }
 
   .rpa-footer-legal {
