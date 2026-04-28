@@ -41,9 +41,12 @@ function getLocalUser() {
 loginTab?.addEventListener("click", () => setMode("login"));
 signupTab?.addEventListener("click", () => setMode("signup"));
 
-if (window.location.hash === "#signup") {
-  setMode("signup");
+function syncModeFromHash() {
+  setMode(window.location.hash === "#signup" ? "signup" : "login");
 }
+
+syncModeFromHash();
+window.addEventListener("hashchange", syncModeFromHash);
 
 loginForm?.addEventListener("submit", async (event) => {
   event.preventDefault();

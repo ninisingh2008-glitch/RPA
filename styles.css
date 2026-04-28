@@ -2134,10 +2134,7 @@ textarea {
 
   .landing-nav-links.is-open,
   .landing-auth.is-open {
-    position: absolute;
-    left: 0;
-    right: 0;
-    background: #fff;
+    background: rgba(255, 251, 245, 0.98);
     padding: 1rem 1.5rem;
   }
 
@@ -2154,7 +2151,6 @@ textarea {
   }
 
   .landing-auth.is-open {
-    top: calc(100% + 250px);
     display: flex;
     flex-direction: column;
     gap: 0.8rem;
@@ -2168,6 +2164,71 @@ textarea {
 }
 
 @media (max-width: 720px) {
+  .landing-nav {
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    padding: 12px 14px;
+  }
+
+  .landing-nav .brand {
+    order: 1;
+    max-width: calc(100% - 54px);
+  }
+
+  .landing-nav .brand-logo {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 auto;
+  }
+
+  .landing-nav .brand-text strong {
+    font-size: 0.95rem;
+  }
+
+  .landing-nav .brand-text span {
+    max-width: 19ch;
+    font-size: 0.62rem;
+    letter-spacing: 0.08em;
+    white-space: normal;
+  }
+
+  .landing-nav-toggle {
+    order: 2;
+    flex: 0 0 auto;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(15, 106, 119, 0.08);
+  }
+
+  .landing-nav-toggle span {
+    margin: 4px auto;
+  }
+
+  .landing-nav-links.is-open,
+  .landing-auth.is-open {
+    position: static;
+    flex: 0 0 100%;
+    border-bottom: 0;
+    background: transparent;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  .landing-nav-links.is-open {
+    order: 3;
+    top: auto;
+    gap: 0.85rem;
+    padding-top: 0.85rem;
+    padding-bottom: 0.35rem;
+  }
+
+  .landing-auth.is-open {
+    order: 4;
+    padding-top: 0.25rem;
+    padding-bottom: 0.2rem;
+  }
+
   .site-nav {
     overflow-x: auto;
     width: 100%;
@@ -2230,6 +2291,215 @@ textarea {
 
   .admin-field-wide {
     grid-column: span 1;
+  }
+}
+
+@media (max-width: 720px) {
+  .auth-body .site-header {
+    position: static;
+  }
+
+  .auth-body .header-inner {
+    gap: 0.9rem;
+    padding: 0.85rem 0 1rem;
+  }
+
+  .auth-body .brand {
+    max-width: 100%;
+  }
+
+  .auth-body .brand-logo {
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+  }
+
+  .auth-body .brand-text strong {
+    font-size: 0.95rem;
+  }
+
+  .auth-body .brand-text span {
+    max-width: 20ch;
+    white-space: normal;
+    letter-spacing: 0.08em;
+  }
+
+  .auth-body .site-nav {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-self: stretch;
+    gap: 0.45rem;
+    padding: 0.35rem;
+    border-radius: 18px;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .auth-body .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .auth-body .site-nav a {
+    flex: 0 0 auto;
+    padding: 0.55rem 0.8rem;
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .auth-body .auth-actions {
+    width: 100%;
+  }
+
+  .auth-body .auth-actions .btn {
+    width: auto;
+    min-height: 42px;
+    padding: 0.65rem 1rem;
+  }
+
+  .auth-shell {
+    width: min(calc(100% - 2rem), var(--shell));
+    padding: 1.15rem 0 2.5rem;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    overflow: hidden;
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
+  .auth-grid {
+    width: 100%;
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 1rem;
+  }
+
+  .auth-visual-panel {
+    min-height: 245px;
+    border-radius: 20px;
+  }
+
+  .auth-visual-panel img {
+    min-height: 245px;
+  }
+
+  .auth-visual-copy {
+    left: 1rem;
+    right: 1rem;
+    bottom: 1rem;
+  }
+
+  .auth-visual-copy h1 {
+    max-width: 10ch;
+    margin: 0.65rem 0 0.55rem;
+    font-size: clamp(2rem, 10vw, 2.55rem);
+    letter-spacing: 0;
+  }
+
+  .auth-visual-copy p {
+    font-size: 0.95rem;
+    line-height: 1.5;
+  }
+
+  .auth-member-types {
+    display: flex;
+    grid-template-columns: none;
+    gap: 0.75rem;
+    margin-right: -1rem;
+    padding-right: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 106, 119, 0.35) transparent;
+  }
+
+  .auth-member-types article {
+    flex: 0 0 min(260px, 78vw);
+    scroll-snap-align: start;
+  }
+
+  .auth-form-card {
+    order: -1;
+  }
+
+  .auth-form-card h2 {
+    font-size: 1.65rem;
+    letter-spacing: 0;
+  }
+
+  .auth-form-card > p {
+    overflow-wrap: anywhere;
+  }
+
+  .auth-switch {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    border-radius: 18px;
+    overflow: hidden;
+  }
+
+  .auth-switch button {
+    min-width: 0;
+    min-height: 44px;
+    padding: 0.55rem 0.75rem;
+  }
+
+  .stack-form {
+    gap: 0.7rem;
+  }
+
+  .stack-form label {
+    display: grid;
+    gap: 0.35rem;
+    font-size: 0.92rem;
+  }
+
+  .auth-body input,
+  .auth-body select {
+    min-height: 48px;
+    border-radius: 14px;
+    padding: 0.78rem 0.9rem;
+  }
+
+  .auth-body .stack-form .btn {
+    min-height: 50px;
+  }
+
+  .auth-faq-strip {
+    padding: 1rem;
+    border-radius: 22px;
+  }
+
+  .auth-faq-head {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .auth-faq-head h2 {
+    font-size: 1.35rem;
+  }
+
+  .auth-faq-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 0.75rem;
+    margin-right: -1rem;
+    padding-right: 1rem;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 106, 119, 0.35) transparent;
+  }
+
+  .auth-faq-grid article {
+    flex: 0 0 min(270px, 82vw);
+    scroll-snap-align: start;
   }
 }
 
@@ -4832,6 +5102,50 @@ body[data-page="tournaments"] .landing-auth .btn-primary {
     flex-direction: column;
     align-items: flex-start;
   }
+
+  .tourneys-archive-grid,
+  .tourneys-handbook-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 0.85rem;
+    margin-right: -1rem;
+    padding: 0.15rem 1rem 0.85rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 106, 119, 0.35) transparent;
+  }
+
+  .tourneys-archive-grid::-webkit-scrollbar,
+  .tourneys-handbook-grid::-webkit-scrollbar {
+    height: 8px;
+  }
+
+  .tourneys-archive-grid::-webkit-scrollbar-thumb,
+  .tourneys-handbook-grid::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    background: rgba(15, 106, 119, 0.28);
+  }
+
+  .tourneys-archive-card,
+  .tourneys-handbook-card {
+    flex: 0 0 min(285px, 82vw);
+    min-height: 180px;
+    scroll-snap-align: start;
+  }
+
+  .tourneys-archive-card h3,
+  .tourneys-handbook-card h3 {
+    font-size: 1.05rem;
+    line-height: 1.2;
+  }
+
+  .tourneys-archive-card p,
+  .tourneys-handbook-card p {
+    font-size: 0.9rem;
+    line-height: 1.55;
+  }
 }
 
 body[data-page="about"] {
@@ -4987,6 +5301,50 @@ body[data-page="state-team"] .landing-auth .btn-primary {
   background: linear-gradient(180deg, #ffab32 0%, #f28a18 100%);
   color: #fff;
   box-shadow: 0 12px 24px rgba(242, 138, 24, 0.3);
+}
+
+@media (max-width: 720px) {
+  body[data-page] .landing-nav {
+    flex-wrap: wrap;
+    gap: 0.7rem;
+    padding: 12px 14px;
+  }
+
+  body[data-page] .landing-nav .brand {
+    order: 1;
+    max-width: calc(100% - 54px);
+  }
+
+  body[data-page] .landing-nav-toggle {
+    order: 2;
+  }
+
+  body[data-page] .landing-nav-links.is-open,
+  body[data-page] .landing-auth.is-open {
+    position: static;
+    flex: 0 0 100%;
+    border-bottom: 0;
+    background: transparent;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+
+  body[data-page] .landing-nav-links.is-open {
+    order: 3;
+    gap: 0.85rem;
+    padding-top: 0.85rem;
+    padding-bottom: 0.35rem;
+  }
+
+  body[data-page] .landing-nav-links.is-open a {
+    padding: 0.35rem 0;
+  }
+
+  body[data-page] .landing-auth.is-open {
+    order: 4;
+    padding-top: 0.25rem;
+    padding-bottom: 0.2rem;
+  }
 }
 
 .about-rpa {
@@ -7168,6 +7526,85 @@ body[data-page="contact"] {
 .districts-all-card-status--emerging {
   background: rgba(211, 138, 45, 0.14);
   color: #8a4e0a;
+}
+
+@media (max-width: 760px) {
+  .tourneys-rpa-section,
+  .districts-rpa-grid > *,
+  .districts-rpa-section {
+    min-width: 0;
+  }
+
+  .tourneys-archive-grid,
+  .tourneys-handbook-grid {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .districts-feature-grid,
+  .districts-all-grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 0.85rem;
+    margin-right: -1rem;
+    padding: 0.15rem 1rem 0.85rem 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(15, 106, 119, 0.35) transparent;
+  }
+
+  .districts-feature-card {
+    flex: 0 0 min(285px, 82vw);
+    min-height: 230px;
+    scroll-snap-align: start;
+  }
+
+  .districts-all-card {
+    flex: 0 0 min(310px, 86vw);
+    grid-template-columns: 58px minmax(0, 1fr);
+    align-items: start;
+    min-height: 118px;
+    padding: 0.8rem;
+    scroll-snap-align: start;
+  }
+
+  .districts-all-card-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 16px;
+    aspect-ratio: 1;
+  }
+
+  .districts-all-card-copy {
+    padding: 0;
+  }
+
+  .districts-all-card-copy h3 {
+    padding-right: 5.8rem;
+  }
+
+  .districts-all-card-copy p {
+    display: -webkit-box;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    line-height: 1.45;
+  }
+
+  .districts-all-card .districts-all-card-status {
+    position: absolute;
+    top: 0.8rem;
+    right: 0.8rem;
+    justify-self: auto;
+    grid-column: auto;
+  }
+
+  .districts-directory-head {
+    gap: 0.45rem;
+    margin-bottom: 0.15rem;
+  }
 }
 
 /* ── Affiliated Clubs & Academies map ─────────── */
