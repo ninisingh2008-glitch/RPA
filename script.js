@@ -633,8 +633,6 @@ function renderHome(data) {
           </div>
         </section>
 
-        ${renderClubsMap()}
-
         <section class="rpa-section-grid rpa-section-grid--bottom">
           <div class="rpa-block">
             <div class="rpa-section-head">
