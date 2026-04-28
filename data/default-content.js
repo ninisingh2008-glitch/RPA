@@ -14,8 +14,17 @@ const pages = {
       stats: [
         { value: "33", label: "District Bodies", href: "districts.html" },
         { value: "800+", label: "Registered Players", href: "membership.html" },
-        { value: "12", label: "Annual RPA Events", href: "tournaments.html" },
+        { value: "12", label: "Annual RPA Events", href: "calendar.html" },
         { value: "20+", label: "Affiliated Clubs & Academies", href: "membership.html" }
+      ]
+    },
+    instagram: {
+      handle: "@rajasthanpickleballassociation",
+      href: "https://www.instagram.com/rajasthanpickleballassociation/",
+      highlights: [
+        { title: "Tournament Reels", body: "Match-day clips, podium moments, and court-side energy from RPA events." },
+        { title: "District Spotlights", body: "Updates from Jaipur, Udaipur, Jodhpur, Kota, Ajmer, Bikaner and emerging districts." },
+        { title: "Player Pathway", body: "Trials, training camps, junior sessions, and selection announcements." }
       ]
     },
     about: {
@@ -44,6 +53,11 @@ const pages = {
         title: "Infrastructure & Partnerships",
         body: "Venue partnerships, district readiness, and ecosystem support that help the sport scale responsibly.",
         icon: "arena"
+      },
+      {
+        title: "Affiliated Clubs & Academies",
+        body: "A growing network of recognised clubs and academies supporting coaching, access, and player development.",
+        icon: "clinics"
       }
     ],
     quickLinks: {
@@ -503,7 +517,7 @@ const pages = {
       description:
         "Use the right contact route for tournaments, team enquiries, media, partnerships, and general association questions.",
       actions: [
-        { label: "General Enquiry", href: "mailto:hello@rajasthanpickleball.org" },
+        { label: "General Enquiry", href: "mailto:connect@rajasthanpickleball.com" },
         { label: "Member Access", href: "auth.html", secondary: true }
       ],
       tags: ["General", "Tournament", "State team", "Partnerships"]
@@ -527,7 +541,7 @@ const pages = {
         title: "Contact details.",
         items: [
           { title: "Office / Base Location", body: "Jaipur, Rajasthan, India", meta: "Base" },
-          { title: "Social Media Links", body: "Instagram, Facebook, and YouTube updates are published through the official RPA channels.", meta: "Channels" },
+          { title: "Social Media Links", body: "Instagram: @rajasthanpickleballassociation. Event reels, district highlights, player pathway updates, and official announcements are published through RPA channels.", meta: "Channels" },
           { title: "Contact Form", body: "Use the contact form for routed replies on tournaments, media, team matters, and partnerships.", meta: "Form" }
         ]
       },
@@ -633,7 +647,7 @@ const news = [
     category: "Media Update",
     date: "2026-04-08",
     summary: "Latest event visuals, district activity photos and feature stories are now available in the media gallery.",
-    link: "news.html",
+    link: "gallery.html",
     image: "https://images.unsplash.com/photo-1564507592333-c60657eea523?auto=format&fit=crop&fm=jpg&q=80&w=1200"
   }
 ];

@@ -166,12 +166,13 @@ function getLocalSession() {
 
 function getLocalBootstrap(page) {
   const defaults = window.RPA_DEFAULTS;
-  if (!defaults?.pages?.[page]) {
+  const contentPage = page === "gallery" ? "news" : page === "calendar" ? "tournaments" : page;
+  if (!defaults?.pages?.[contentPage]) {
     throw new Error(`Local content was not found for "${page}".`);
   }
 
   return {
-    page: deepClone(defaults.pages[page]),
+    page: deepClone(defaults.pages[contentPage]),
     tournaments: deepClone(defaults.tournaments || []),
     team: deepClone(defaults.team || []),
     news: deepClone(defaults.news || []),
@@ -654,7 +655,7 @@ ${debugBanner}
         <div class="tourneys-rpa-section">
           <div class="tourneys-rpa-section-head">
             <h2>Past Events / Results</h2>
-            <a href="news.html">View all results</a>
+            <a href="gallery.html">View all results</a>
           </div>
           <div class="tourneys-results-grid">
             ${(allTournaments.length ? allTournaments : [])
@@ -706,6 +707,76 @@ ${debugBanner}
   `;
 }
 
+function renderAnnualCalendarPage(page, data) {
+  const tournaments = data.tournaments || [];
+  const months = [
+    { month: "January", focus: "District planning and club onboarding" },
+    { month: "February", focus: "Introductory clinics and school outreach" },
+    { month: "March", focus: "Club meets and academy development sessions" },
+    { month: "April", focus: "District activation camps" },
+    { month: "May", focus: "District circuit weekends" },
+    { month: "June", focus: "RPA State Open window" },
+    { month: "July", focus: "Road to Nationals trials" },
+    { month: "August", focus: "Junior development and ranking events" },
+    { month: "September", focus: "Inter-district tournament window" },
+    { month: "October", focus: "Coaching, refereeing and academy workshops" },
+    { month: "November", focus: "State championship preparation" },
+    { month: "December", focus: "Annual review and next-season calendar" }
+  ];
+
+  const eventsByMonth = tournaments.reduce((acc, item) => {
+    const date = new Date(item.date);
+    if (Number.isNaN(date.getTime())) return acc;
+    const month = new Intl.DateTimeFormat("en-IN", { month: "long" }).format(date);
+    acc[month] = acc[month] || [];
+    acc[month].push(item);
+    return acc;
+  }, {});
+
+  return `
+    <section class="media-rpa annual-calendar-page">
+      <section class="media-rpa-hero reveal">
+        <div class="media-rpa-copy">
+          <span class="rpa-pill">Annual RPA Events</span>
+          <h1>
+            Annual
+            <span>Calendar</span>
+          </h1>
+          <p>Follow the broad RPA event rhythm for tournaments, district activity, trials, clubs, academies and development programs across Rajasthan.</p>
+          <div class="media-rpa-actions">
+            <a href="tournaments.html" class="btn btn-primary">View Tournaments</a>
+            <a href="contact.html" class="btn btn-ghost">Ask About Events</a>
+          </div>
+        </div>
+        <div class="media-rpa-visual">
+          <img src="assets/Tournaments Main Image.png" alt="RPA annual event calendar" class="media-rpa-image" />
+        </div>
+      </section>
+
+      <section class="media-rpa-section reveal">
+        <div class="tourneys-rpa-section-head">
+          <h2>Annual calendar of events</h2>
+          <a href="tournaments.html">Open tournament desk</a>
+        </div>
+        <div class="annual-calendar-grid">
+          ${months
+            .map((item) => {
+              const events = eventsByMonth[item.month] || [];
+              return `
+                <article class="annual-calendar-card">
+                  <span>${escapeHtml(item.month)}</span>
+                  <h3>${escapeHtml(events[0]?.name || item.focus)}</h3>
+                  <p>${escapeHtml(events[0] ? `${formatDate(events[0].date)} · ${events[0].city || "Rajasthan"}` : item.focus)}</p>
+                </article>
+              `;
+            })
+            .join("")}
+        </div>
+      </section>
+    </section>
+  `;
+}
+
 function renderTournamentDetailPage(page, tournament, allTournaments) {
   const related = (allTournaments || []).filter((item) => item.id !== tournament.id).slice(0, 3);
   const detailRows = [
@@ -731,7 +802,7 @@ function renderTournamentDetailPage(page, tournament, allTournaments) {
             )}</p>
             <div class="tourneys-rpa-actions">
               <a href="${escapeHtml(tournament.registrationLink || "contact.html")}" class="btn btn-primary">Register / Enquire</a>
-              <a href="news.html" class="btn btn-ghost">Open Gallery</a>
+              <a href="gallery.html" class="btn btn-ghost">Open Gallery</a>
             </div>
           </div>
           <img src="${escapeHtml(imageForTournament(tournament, 0))}" alt="${escapeHtml(tournament.name || "Tournament")}" class="tourneys-detail-image" />
@@ -1157,7 +1228,7 @@ function renderMediaCustomPage(page, data) {
               const image = item.coverImage || "";
               const title = item.title || "Gallery event";
               const category = item.category || "";
-              const href = `news.html?id=${encodeURIComponent(recordKey(item))}`;
+              const href = `gallery.html?id=${encodeURIComponent(recordKey(item))}`;
               return `
                 <a class="media-gallery-card" href="${href}">
                   <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" class="media-gallery-image" />
@@ -1211,7 +1282,7 @@ function renderGalleryEventsPage(page, data) {
           ${events
             .map(
               (item) => `
-                <a class="media-gallery-card" href="news.html?id=${encodeURIComponent(recordKey(item))}">
+                <a class="media-gallery-card" href="gallery.html?id=${encodeURIComponent(recordKey(item))}">
                   <img src="${escapeHtml(item.coverImage || "assets/logo.jpeg")}" alt="${escapeHtml(item.title || "Gallery event")}" class="media-gallery-image" />
                   <div class="media-gallery-copy">
                     <h3>${escapeHtml(item.title || "")}</h3>
@@ -1247,7 +1318,7 @@ function renderGalleryEventDetailPage(page, event, images, events) {
   return `
     <section class="media-rpa">
       <section class="gallery-event-hero reveal">
-        <a href="news.html" class="tourneys-back-link">Back to gallery events</a>
+        <a href="gallery.html" class="tourneys-back-link">Back to gallery events</a>
         <div class="gallery-event-head">
           <div>
             <span class="rpa-pill">${escapeHtml(event.category || "Gallery")}</span>
@@ -1361,7 +1432,7 @@ function renderContactCustomPage(page, data) {
               const image = item.coverImage || "";
               const title = item.title || "Gallery event";
               const category = item.category || "";
-              const href = `news.html?id=${encodeURIComponent(recordKey(item))}`;
+              const href = `gallery.html?id=${encodeURIComponent(recordKey(item))}`;
               return `
                 <a class="media-gallery-card" href="${href}">
                   <img src="${escapeHtml(image)}" alt="${escapeHtml(title)}" class="media-gallery-image" />
@@ -2015,6 +2086,12 @@ function renderPage() {
   }
   if (pageName === "tournaments") {
     root.innerHTML = renderTournamentsCustomPage(currentPage, currentData);
+    setupReveal();
+    setupDynamicPage();
+    return;
+  }
+  if (pageName === "calendar") {
+    root.innerHTML = renderAnnualCalendarPage(currentPage, currentData);
     setupReveal();
     setupDynamicPage();
     return;

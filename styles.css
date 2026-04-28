@@ -2546,6 +2546,23 @@ textarea {
   transform: none;
 }
 
+.rpa-hero.reveal,
+.tourneys-rpa-hero.reveal,
+.media-rpa-hero.reveal,
+.districts-rpa-hero.reveal,
+.membership-rpa-hero.reveal,
+.contact-rpa-hero.reveal,
+.about-rpa-hero.reveal,
+.gallery-event-hero.reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.annual-calendar-page .media-rpa-section.reveal {
+  opacity: 1;
+  transform: none;
+}
+
 /* ── Card image (news) ────────────────────────────────────── */
 .landing-card img.card-media {
   width: 100%;
@@ -3194,16 +3211,37 @@ a.rpa-stat-card--link:hover {
 }
 
 .rpa-feature-grid {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 0.2rem 0.1rem 0.85rem;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(15, 106, 119, 0.35) transparent;
+}
+
+.rpa-feature-grid::-webkit-scrollbar {
+  height: 8px;
+}
+
+.rpa-feature-grid::-webkit-scrollbar-thumb {
+  border-radius: 999px;
+  background: rgba(15, 106, 119, 0.28);
 }
 
 .rpa-feature-card {
-  padding: 1.35rem 1rem 1.2rem;
+  flex: 0 0 min(300px, 82vw);
+  min-height: 250px;
+  padding: 1.45rem 1.15rem 1.25rem;
   border: 1px solid rgba(15, 106, 119, 0.08);
   border-radius: 18px;
-  background: #fffefa;
-  text-align: center;
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.96), rgba(250, 239, 225, 0.86)),
+    radial-gradient(circle at 90% 8%, rgba(239, 140, 34, 0.16), transparent 34%);
+  text-align: left;
   box-shadow: 0 14px 24px rgba(40, 48, 55, 0.06);
+  scroll-snap-align: start;
   transform: perspective(900px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
@@ -3217,13 +3255,15 @@ a.rpa-stat-card--link:hover {
   height: 64px;
   display: grid;
   place-items: center;
-  margin: 0 auto 1rem;
+  margin: 0 0 1.25rem;
+  border-radius: 18px;
   color: #0d7a8d;
-  background: transparent;
+  background: rgba(15, 125, 141, 0.1);
 }
 
 .rpa-feature-card:nth-child(even) .rpa-feature-icon {
   color: #ef8c22;
+  background: rgba(239, 140, 34, 0.12);
 }
 
 .rpa-feature-card h3 {
@@ -3239,9 +3279,96 @@ a.rpa-stat-card--link:hover {
   color: #6b7b81;
 }
 
-.rpa-city-strip {
+.rpa-instagram-band {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.28fr);
+  gap: 1rem;
+  margin: 1.3rem clamp(28px, 4vw, 56px) 0;
+  padding: 1.1rem;
+  border-radius: 26px;
+  border: 1px solid rgba(15, 106, 119, 0.08);
+  background:
+    linear-gradient(135deg, rgba(255, 251, 245, 0.98), rgba(255, 239, 219, 0.84)),
+    radial-gradient(circle at 100% 0, rgba(239, 140, 34, 0.18), transparent 34%);
+  box-shadow: 0 14px 24px rgba(40, 48, 55, 0.06);
+}
+
+.rpa-instagram-head {
+  display: grid;
+  align-content: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.6rem;
+}
+
+.rpa-instagram-head span {
+  color: #d6831a;
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.rpa-instagram-head h2 {
+  margin: 0;
+  color: #0d6170;
+  font-size: clamp(1.25rem, 2vw, 1.85rem);
+  letter-spacing: 0;
+  overflow-wrap: anywhere;
+}
+
+.rpa-instagram-head a {
+  width: fit-content;
+  color: #0f6877;
+  font-size: 0.88rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
+.rpa-instagram-highlights {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.rpa-instagram-card {
+  min-height: 150px;
+  padding: 1rem;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(160deg, #0f7d8d, #0a5c69);
+}
+
+.rpa-instagram-card--2 {
+  background: linear-gradient(160deg, #ef8c22, #b95d18);
+}
+
+.rpa-instagram-card--3 {
+  background: linear-gradient(160deg, #213842, #0d6170);
+}
+
+.rpa-instagram-card strong,
+.rpa-instagram-card p {
+  color: inherit;
+}
+
+.rpa-instagram-card strong {
+  display: block;
+  margin-bottom: 0.55rem;
+  font-size: 1rem;
+}
+
+.rpa-instagram-card p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.82);
+  font-size: 0.86rem;
+  line-height: 1.55;
+}
+
+.rpa-city-strip {
+  position: relative;
+  display: grid;
+  grid-template-columns: 280px 1fr;
   align-items: center;
   gap: 1.5rem;
   margin: 1.3rem clamp(28px, 4vw, 56px) 0;
@@ -3251,6 +3378,23 @@ a.rpa-stat-card--link:hover {
   background: linear-gradient(180deg, #0f8092 0%, #0a6575 100%);
   color: #fff;
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+}
+
+.rpa-city-strip::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 34%;
+  background:
+    radial-gradient(circle at 18% 30%, rgba(255, 255, 255, 0.18), transparent 32%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.1), transparent);
+  pointer-events: none;
+}
+
+.rpa-city-copy {
+  position: relative;
+  z-index: 1;
 }
 
 .rpa-city-title {
@@ -3262,9 +3406,40 @@ a.rpa-stat-card--link:hover {
   text-transform: uppercase;
 }
 
+.rpa-city-link {
+  display: inline-flex;
+  margin-top: 0.55rem;
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 0.82rem;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+
 .rpa-city-marquee {
   position: relative;
   overflow: hidden;
+}
+
+.rpa-city-marquee::before,
+.rpa-city-marquee::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 2;
+  width: 64px;
+  pointer-events: none;
+}
+
+.rpa-city-marquee::before {
+  left: 0;
+  background: linear-gradient(90deg, #0f8092, transparent);
+}
+
+.rpa-city-marquee::after {
+  right: 0;
+  background: linear-gradient(270deg, #0a6575, transparent);
 }
 
 .rpa-city-list {
@@ -3286,6 +3461,12 @@ a.rpa-stat-card--link:hover {
   letter-spacing: 0.01em;
   text-transform: uppercase;
   white-space: nowrap;
+  transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.rpa-city-pill:hover {
+  color: #fff;
+  transform: translateY(-2px);
 }
 
 .rpa-city-icon {
@@ -3574,10 +3755,17 @@ a.rpa-stat-card--link:hover {
     grid-template-columns: 1fr;
   }
 
-  .rpa-feature-grid,
   .rpa-gallery-grid,
   .rpa-footer-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .rpa-instagram-band {
+    grid-template-columns: 1fr;
+  }
+
+  .annual-calendar-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
   .rpa-tournament-grid,
@@ -3610,9 +3798,18 @@ a.rpa-stat-card--link:hover {
   }
 
   .rpa-stats,
-  .rpa-feature-grid,
   .rpa-gallery-grid,
   .rpa-footer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .rpa-instagram-band {
+    margin-left: 1.2rem;
+    margin-right: 1.2rem;
+  }
+
+  .rpa-instagram-highlights,
+  .annual-calendar-grid {
     grid-template-columns: 1fr;
   }
 
@@ -5158,6 +5355,44 @@ body[data-page="contact"] {
   font-weight: 700;
 }
 
+.annual-calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.annual-calendar-card {
+  min-height: 170px;
+  padding: 1.1rem;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 106, 119, 0.08);
+  background: #fffefa;
+  box-shadow: 0 14px 24px rgba(40, 48, 55, 0.06);
+}
+
+.annual-calendar-card span {
+  display: inline-flex;
+  margin-bottom: 0.7rem;
+  color: #d6831a;
+  font-size: 0.78rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.annual-calendar-card h3 {
+  margin: 0 0 0.65rem;
+  color: #123f49;
+  font-size: 1.05rem;
+  letter-spacing: 0;
+}
+
+.annual-calendar-card p {
+  margin: 0;
+  color: #64777e;
+  font-size: 0.9rem;
+}
+
 .contact-rpa-strip {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -5533,12 +5768,6 @@ body[data-page="contact"] {
   height: 18px;
   stroke: #0f7d8d;
   fill: none;
-}
-
-.rpa-motif--jodhpur {
-  bottom: 18%;
-  left: -2%;
-  animation-delay: 0s;
 }
 
 .rpa-motif--udaipur {

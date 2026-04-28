@@ -222,6 +222,10 @@ function iconMarkup(icon) {
     trophy:
       '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v4a6 6 0 0 1-5 5.91V16h4v2H7v-2h4v-3.09A6 6 0 0 1 6 7V3Zm-3 1h3v2a3 3 0 0 1-3 3V4Zm18 0v5a3 3 0 0 1-3-3V4h3Z"/></svg>',
     flag: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 2h2v20H6V2Zm3 2h9l-2 4 2 4H9V4Z"/></svg>',
+    shield:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 20 5v6c0 5-3.3 9.1-8 11-4.7-1.9-8-6-8-11V5l8-3Zm-1 13.2 5.3-5.3-1.4-1.4L11 12.4 9.1 10.5 7.7 12l3.3 3.2Z"/></svg>',
+    arena:
+      '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 19V8l9-5 9 5v11h-3v-6H6v6H3Zm4-8h10V9l-5-2.8L7 9v2Zm1 8v-4h3v4H8Zm5 0v-4h3v4h-3Z"/></svg>',
     quote:
       '<svg viewBox="0 0 32 24" aria-hidden="true"><path d="M13 0C7.48 0 3 4.48 3 10v11h10V11H8c.55-3.3 2.4-5 5-5V0Zm16 0c-5.52 0-10 4.48-10 10v11h10V11h-5c.55-3.3 2.4-5 5-5V0Z"/></svg>'
   };
@@ -316,7 +320,7 @@ function renderGallery(galleryEvents) {
     .slice(0, 3)
     .map(
       (item, index) => `
-        <a href="news.html?id=${encodeURIComponent(recordKey(item, index))}" class="rpa-gallery-card reveal rpa-gallery-card--${(index % 4) + 1}">
+        <a href="gallery.html?id=${encodeURIComponent(recordKey(item, index))}" class="rpa-gallery-card reveal rpa-gallery-card--${(index % 4) + 1}">
           <img
             src="${escapeHtml(item.coverImage || item.image || fallback[index % fallback.length].image)}"
             alt="${escapeHtml(item.title || item.summary || "Community action image")}"
@@ -410,13 +414,48 @@ function renderCities() {
   return loop
     .map(
       (city, index) => `
-        <span class="rpa-city-pill">
+        <a href="districts.html#district-network" class="rpa-city-pill" aria-label="Explore ${escapeHtml(city)} on the districts page">
           <span class="rpa-city-icon" aria-hidden="true">${cityIconMarkup((index % 4) + 1)}</span>
-          ${city}
-        </span>
+          ${escapeHtml(city)}
+        </a>
       `
     )
     .join("");
+}
+
+function renderInstagramHighlights(instagram = {}) {
+  const handle = instagram.handle || "@rajasthanpickleballassociation";
+  const href = instagram.href || "https://www.instagram.com/rajasthanpickleballassociation/";
+  const highlights = instagram.highlights?.length
+    ? instagram.highlights
+    : [
+        { title: "Tournament Reels", body: "Match-day clips, podium moments, and official event coverage." },
+        { title: "District Spotlights", body: "Community updates from active and emerging districts." },
+        { title: "Player Pathway", body: "Trials, training camps, and selection announcements." }
+      ];
+
+  return `
+    <section class="rpa-instagram-band reveal">
+      <div class="rpa-instagram-head">
+        <span>Instagram</span>
+        <h2>${escapeHtml(handle)}</h2>
+        <a href="${escapeHtml(href)}" target="_blank" rel="noopener">Open Instagram</a>
+      </div>
+      <div class="rpa-instagram-highlights">
+        ${highlights
+          .slice(0, 3)
+          .map(
+            (item, index) => `
+              <article class="rpa-instagram-card rpa-instagram-card--${index + 1}">
+                <strong>${escapeHtml(item.title || "")}</strong>
+                <p>${escapeHtml(item.body || "")}</p>
+              </article>
+            `
+          )
+          .join("")}
+      </div>
+    </section>
+  `;
 }
 
 function renderHome(data) {
@@ -453,10 +492,6 @@ function renderHome(data) {
             <img src="assets/Index Main Image.png" alt="" class="rpa-hero-image" />
             <div class="rpa-orbit-badge">
               <img src="assets/logo.jpeg" alt="" class="rpa-orbit-logo" />
-            </div>
-            <div class="rpa-motif rpa-motif--jodhpur">
-              <svg viewBox="0 0 40 32" fill="none" aria-hidden="true"><path d="M2 28h36M6 28V18h4v-4h4v4h4v-6h4v6h4v-4h4v4h4v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M18 14V10h4v4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-              <span>Jodhpur</span>
             </div>
             <div class="rpa-motif rpa-motif--udaipur">
               <svg viewBox="0 0 40 32" fill="none" aria-hidden="true"><path d="M2 26h36M8 26V16c4 0 6-3 6-6h8c0 3 2 6 6 6v10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M16 10a4 4 0 0 1 8 0" stroke="currentColor" stroke-width="1.5"/><circle cx="20" cy="7" r="2" fill="currentColor"/></svg>
@@ -510,8 +545,13 @@ function renderHome(data) {
           </div>
         </section>
 
+        ${renderInstagramHighlights(page.instagram)}
+
         <section class="rpa-city-strip reveal">
-          <div class="rpa-city-title">A Community Across Rajasthan</div>
+          <div class="rpa-city-copy">
+            <div class="rpa-city-title">Districts Across Rajasthan</div>
+            <a href="districts.html#district-network" class="rpa-city-link">Explore all districts</a>
+          </div>
           <div class="rpa-city-marquee">
             <div class="rpa-city-list">${renderCities()}</div>
           </div>
@@ -522,7 +562,7 @@ function renderHome(data) {
             <div class="rpa-section-head">
               <span></span>
               <h2>Our Community In Action</h2>
-              <a href="news.html">View gallery</a>
+              <a href="gallery.html">View gallery</a>
             </div>
             <div class="rpa-gallery-grid">
               ${renderGallery(data.galleryEvents || data.news || [])}
